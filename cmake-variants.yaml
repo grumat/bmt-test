@@ -1,0 +1,31 @@
+buildType:
+  default: debug
+  description: Build mode
+  choices:
+    debug:
+      short: Debug
+      long: Build with debugging information
+      buildType: Debug
+    release: 
+      short: Release
+      long: Optimized binaries
+      buildType: Release
+
+chipType:
+  default: F103
+  choices:
+    F103:
+      short: STM32F103
+      long: Target STM32F103 MCU
+      settings:
+        TARGET_MCU: STM32F103xB
+    L432:
+      short: STM32L432
+      long: Target STM32L432 MCU
+      settings:
+        TARGET_MCU: STM32L432xx
+    G431:
+      short: STM32G431
+      long: Target STM32G431 MCU
+      settings:
+        TARGET_MCU: STM32G431xx
