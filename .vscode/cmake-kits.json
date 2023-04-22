@@ -1,0 +1,6 @@
+[
+    {
+        "name": "SysGCC arm-eabi 10.3.1",
+        "toolchainFile": "${workspaceFolder}/cmake/arm-eabi.cmake"
+    }
+]

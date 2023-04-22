@@ -1,2 +1,4 @@
 {
+    "cmake.parseBuildDiagnostics": false,
+    "C_Cpp.errorSquiggles": "disabled"
 }

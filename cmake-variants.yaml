@@ -19,13 +19,16 @@ chipType:
       long: Target STM32F103 MCU
       settings:
         TARGET_MCU: STM32F103xB
+        DEVICE_SUPPORT: STM32F1xx
     L432:
       short: STM32L432
       long: Target STM32L432 MCU
       settings:
         TARGET_MCU: STM32L432xx
+        DEVICE_SUPPORT: STM32L4xx
     G431:
       short: STM32G431
       long: Target STM32G431 MCU
       settings:
         TARGET_MCU: STM32G431xx
+        DEVICE_SUPPORT: STM32G4xx
