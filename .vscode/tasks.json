@@ -9,26 +9,60 @@
 				"all"
 			],
 			"group": "build",
-			"problemMatcher": {
-				"fileLocation": "absolute",
-				"pattern": {
-					"regexp": "^(.{3,}?):(\\d+):(\\d*):?\\s+(?:fatal\\s+)?(warning|error):\\s+(.*)$",
-					"file": 1,
-					"line": 2,
-					"column": 3,
-					"severity": 4,
-					"message": 5
-				}
-			},
+			"problemMatcher": [
+				{
+					"owner": "cpp",
+					"fileLocation": "absolute",
+					"pattern": {
+						"regexp": "^(.{3,}?):(\\d+):(\\d*):?\\s+(?:fatal\\s+)?(warning|error):\\s+(.*)$",
+						"file": 1,
+						"line": 2,
+						"column": 3,
+						"severity": 4,
+						"message": 5
+					}
+				},
+				{
+					"owner": "cpp",
+					"severity": "error",
+					"fileLocation" : "absolute",
+					"pattern": [
+						{
+							"regexp": "^(\\S+\\/ld\\.exe):\\s+(\\S{3,}?):\\s+(.+?):?$",
+							"file": 2,
+							"line": 3,
+						},
+						{
+							"regexp": "^\\((.+?)\\):\\s+(.+?)$",
+							"column": 1,
+							"message": 2,
+							"code": 1,
+							"loop": true
+						}
+					]
+				},
+				{
+					"owner": "cpp",
+					"severity": "error",
+					"fileLocation" : "absolute",
+					"pattern": [
+						{
+							"regexp": "^(\\S{3,}?):(\\d+):\\s+(.+?)$",
+							"file": 1,
+							"line": 2,
+							"message": 3,
+						},
+					]
+				},
+			],
 			"detail": "CMake template build task",
 			"presentation": {
 				"echo": true,
-				"reveal": "never",
 				"revealProblems": "onProblem",
 				"focus": false,
-				"panel": "shared",
-				"showReuseMessage": true,
-				"clear": true
+				"panel": "dedicated",
+				"showReuseMessage": false,
+				"clear": true,
 			}
 		}
 	]

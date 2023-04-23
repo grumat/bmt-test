@@ -20,15 +20,24 @@ chipType:
       settings:
         TARGET_MCU: STM32F103xB
         DEVICE_SUPPORT: STM32F1xx
+        CPU_FLAG: cortex-m3
+        CUBE_MX: STM32Cube_FW_F1_V1.8.4
+        LINKER_SCRIPT: STM32F103C8_flash.lds
     L432:
       short: STM32L432
       long: Target STM32L432 MCU
       settings:
         TARGET_MCU: STM32L432xx
         DEVICE_SUPPORT: STM32L4xx
+        CPU_FLAG: cortex-m4
+        CUBE_MX: STM32Cube_FW_L4_V1.17.2
+        LINKER_SCRIPT: STM32L432KC_flash.lds
     G431:
       short: STM32G431
       long: Target STM32G431 MCU
       settings:
         TARGET_MCU: STM32G431xx
         DEVICE_SUPPORT: STM32G4xx
+        CPU_FLAG: cortex-m4
+        CUBE_MX: STM32Cube_FW_G4_V1.5.1
+        LINKER_SCRIPT: STM32G431KB_flash.lds

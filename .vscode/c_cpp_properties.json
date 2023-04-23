@@ -1,0 +1,62 @@
+{
+    "configurations": [
+        {
+            "name": "STM32F103xB",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "${env.LOCALAPPDATA}/VisualGDB/EmbeddedBSPs/arm-eabi/com.sysprogs.arm.stm32/STM32F1xxxx/CMSIS_HAL/**"
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE",
+                "STM32F103xB"
+            ],
+            "windowsSdkVersion": "10.0.22000.0",
+            "compilerPath": "C:/SysGCC/arm-eabi/bin/arm-none-eabi-gcc.exe",
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "windows-gcc-arm",
+            "configurationProvider": "ms-vscode.cmake-tools"
+        },
+        {
+            "name": "STM32L432xx",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "${env.LOCALAPPDATA}/VisualGDB/EmbeddedBSPs/arm-eabi/com.sysprogs.arm.stm32/STM32L4xxxx/CMSIS_HAL/**"
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE",
+                "STM32L432xx"
+            ],
+            "windowsSdkVersion": "10.0.22000.0",
+            "compilerPath": "C:/SysGCC/arm-eabi/bin/arm-none-eabi-gcc.exe",
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "windows-gcc-arm",
+            "configurationProvider": "ms-vscode.cmake-tools"
+        },
+        {
+            "name": "STM32G431xx",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "${env.LOCALAPPDATA}/VisualGDB/EmbeddedBSPs/arm-eabi/com.sysprogs.arm.stm32/STM32G4xxxx/CMSIS_HAL/**"
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE",
+                "STM32G431xx"
+            ],
+            "windowsSdkVersion": "10.0.22000.0",
+            "compilerPath": "C:/SysGCC/arm-eabi/bin/arm-none-eabi-gcc.exe",
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "windows-gcc-arm",
+            "configurationProvider": "ms-vscode.cmake-tools"
+        }
+    ],
+    "version": 4
+}

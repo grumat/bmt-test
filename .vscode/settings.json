@@ -1,4 +1,28 @@
 {
     "cmake.parseBuildDiagnostics": false,
-    "C_Cpp.errorSquiggles": "disabled"
+    "C_Cpp.errorSquiggles": "enabled",
+    "cmake.showSystemKits": false,
+    "C_Cpp.default.intelliSenseMode": "windows-gcc-arm",
+	"editor.useTabStops": true,
+	"editor.insertSpaces": false,
+	"editor.detectIndentation": false,
+	"C_Cpp.clang_format_style": "Visual Studio",
+	"C_Cpp.formatting": "vcFormat",
+	"C_Cpp.vcFormat.indent.caseContents": true,
+	"C_Cpp.vcFormat.indent.gotoLabels": "leftmostColumn",
+	"C_Cpp.vcFormat.indent.namespaceContents": false,
+	"C_Cpp.vcFormat.indent.preserveComments": true,
+	"C_Cpp.vcFormat.newLine.beforeOpenBrace.lambda": "newLine",
+	"C_Cpp.vcFormat.newLine.beforeOpenBrace.function": "newLine",
+	"C_Cpp.vcFormat.newLine.beforeOpenBrace.namespace": "newLine",
+	"C_Cpp.vcFormat.newLine.beforeOpenBrace.type": "newLine",
+	"C_Cpp.vcFormat.newLine.scopeBracesOnSeparateLines": true,
+	"cSpell.ignoreRegExpList": [
+		"[A-Z0-9]+"
+	],
+	"cmake.generator": "Unix Makefiles",
+	"cmake.configureSettings": {
+		"CMAKE_MAKE_PROGRAM": "C:/SysGcc/arm-eabi/bin/make.exe"
+	},
+	"cortex-debug.armToolchainPath": "C:/SysGcc/arm-eabi/bin",
 }
