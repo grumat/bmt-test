@@ -329,3 +329,31 @@ static_assert(Test22::kODR_ == 0x00000000, "Error computing ODR value");
 static_assert(Test22::kAfConf_ == 0x00000000, "Error computing AfConf value");
 static_assert(Test22::kAfMask_ == 0xffffffff, "Error computing AfMask value");
 
+typedef Gpio::AnyPortSetup<
+	Gpio::Port::PA,
+	Gpio::Unused<0>,		// unused pin (input + pull-down)
+	Gpio::Unused<1>,		// unused pin (input + pull-down)
+	Gpio::Unused<2>,		// unused pin (input + pull-down)
+	Gpio::Unused<3>,		// unused pin (input + pull-down)
+	Gpio::Unused<4>,		// unused pin (input + pull-down)
+	Gpio::Unused<5>,		// unused pin (input + pull-down)
+	Gpio::Unused<6>,		// unused pin (input + pull-down)
+	Gpio::Unused<7>,		// unused pin (input + pull-down)
+	Gpio::MCO_PA8,			// Alternate output for MCO signal
+	Gpio::Unused<9>,		// unused pin (input + pull-down)
+	Gpio::Unused<10>,		// unused pin (input + pull-down)
+	Gpio::Unused<11>,		// unused pin (input + pull-down)
+	Gpio::Unused<12>,		// unused pin (input + pull-down)
+	Gpio::SWDIO_PA13,		// SWD DIO pin (for debug)
+	Gpio::SWCLK_PA14,		// SWD CLK pin (for debug)
+	Gpio::Unused<15>		// unused pin (input + pull-down)
+> Test50;
+static_assert(Test50::kCRL_ == 0x88888888, "Error computing CRL value");
+static_assert(Test50::kCRL_Mask_ == 0x00000000, "Error computing CRL Mask value");
+static_assert(Test50::kCRH_ == 0x8448888b, "Error computing CRH value");
+static_assert(Test50::kCRH_Mask_ == 0x00000000, "Error computing CRH Mask value");
+static_assert(Test50::kODR_ == 0x00000000, "Error computing ODR value");
+static_assert(Test50::kAfConf_ == 0x04000000, "Error computing AfConf value");
+static_assert(Test50::kAfMask_ == 0xf8ffffff, "Error computing AfMask value");
+static_assert(Test50::kBitValue_ == 0x00006100, "Error computing Bit Value value");
+
