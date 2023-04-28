@@ -15,13 +15,13 @@ typedef Clocks::AnyPll<Hse, 72000000UL> Pll;	// default 8MHz HSE clock
 
 // A data-type for the clock tree
 typedef Clocks::AnySycClk <
-	Pll,						// uses PLL for the clock tree
-	Clocks::AhbPrscl::k1,		// AHB 8 MHz
-	Clocks::ApbPrscl::k2,		// APB1 4 Mhz
-	Clocks::ApbPrscl::k1,		// APB2 8 MHz
-	Clocks::AdcPrscl::k8,		// ADC 1 MHz
-	true,						// stop HSI
-	Clocks::Mco::kPllClkDiv2	// output PLL/2 to the MCO pin (36 MHz)
+	Pll,							// uses PLL for the clock tree
+	Clocks::AhbPrscl::k1,			// AHB 8 MHz
+	Clocks::ApbPrscl::k2,			// APB1 4 Mhz
+	Clocks::ApbPrscl::k1,			// APB2 8 MHz
+	Clocks::AdcPrscl::k8,			// ADC 1 MHz
+	Clocks::SysClkOpts::kDefault,	// defaults: stop HSI, frequency up and no USB,
+	Clocks::Mco::kPllClkDiv2		// output PLL/2 to the MCO pin (36 MHz)
 	> SysClk;
 
 // A data-type to setup the Port A GPIO
