@@ -14,6 +14,6 @@ add_executable(${APP_NAME} ${STARTUP_FILE} main.cpp)
 set_target_properties(${TARGET_NAME} PROPERTIES LINK_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${LINKER_SCRIPT})
 
 add_custom_command(TARGET ${APP_NAME} POST_BUILD
-    COMMAND ${CMAKE_OBJDUMP} -h -S $<TARGET_FILE:${APP_NAME}> > ${APP_NAME}.lst
+    COMMAND ${CMAKE_OBJDUMP} -h -z -S $<TARGET_FILE:${APP_NAME}> > ${APP_NAME}.lst
     VERBATIM)
 

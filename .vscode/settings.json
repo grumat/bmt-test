@@ -25,4 +25,5 @@
 		"CMAKE_MAKE_PROGRAM": "C:/SysGcc/arm-eabi/bin/make.exe"
 	},
 	"cortex-debug.armToolchainPath": "C:/SysGcc/arm-eabi/bin",
+	"cmake.ctest.parallelJobs": 0,
 }
