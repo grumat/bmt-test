@@ -18,7 +18,7 @@
 	"C_Cpp.vcFormat.newLine.beforeOpenBrace.type": "newLine",
 	"C_Cpp.vcFormat.newLine.scopeBracesOnSeparateLines": true,
 	"cSpell.ignoreRegExpList": [
-		"[A-Z0-9]+"
+		"\\b[A-Z0-9]+?\\b"
 	],
 	"cmake.generator": "Unix Makefiles",
 	"cmake.configureSettings": {
@@ -26,4 +26,7 @@
 	},
 	"cortex-debug.armToolchainPath": "C:/SysGcc/arm-eabi/bin",
 	"cmake.ctest.parallelJobs": 0,
+	"cSpell.enableFiletypes": [
+		"markdown"
+	],
 }

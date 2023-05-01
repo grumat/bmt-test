@@ -77,7 +77,7 @@ typedef Gpio::AnyPortSetup <
 ** 80 MHz for the CPU using the same MSI 48 MHz as source.
 */
 
-// A data-type for the 8 MHz MSI clock
+// A data-type for the 48 MHz MSI clock
 typedef Clocks::AnyMsi<
 	Clocks::MsiFreq::k48_MHz		// Change STM32L432KC internal oscillator from 4 MHz to 48MHz (good for USB)
 	, true							// Nucleo32 has an 32768 LSE Xtal that we will use for accurate MSI frequency
