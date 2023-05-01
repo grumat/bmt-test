@@ -12,7 +12,7 @@
 			"type": "cortex-debug",
 			"runToEntryPoint": "main",
 			"servertype": "bmp",
-			"BMPGDBSerialPort": "COM6",
+			"BMPGDBSerialPort": "COM4",
 			"svdPath": "${workspaceFolder}/SVD/STM32F103.svd"
 		},
 		{

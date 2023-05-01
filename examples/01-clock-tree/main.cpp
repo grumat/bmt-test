@@ -179,14 +179,15 @@ typedef Gpio::AnyPortSetup<
 	Gpio::Unused<10>,		// unused pin (input + pull-down)
 	Gpio::Unused<11>,		// unused pin (input + pull-down)
 	Gpio::Unused<12>,		// unused pin (input + pull-down)
-	Gpio::Unchanged<13>,	// don't change SWD/JTAG
-	Gpio::Unchanged<14>,	// don't change SWD/JTAG
-	Gpio::Unchanged<15>		// don't change SWD/JTAG
+	Gpio::SWDIO_PA13,		// SWD DIO pin (for debug)
+	Gpio::SWCLK_PA14,		// SWD CLK pin (for debug)
+	Gpio::Unused<15>		// unused pin (input + pull-down)
 > Test;
 #else
 typedef Gpio::Unchanged<1> Test;
 #endif
 
+#if 0
 const uint32_t g_Value[] = 
 {
 	(uint32_t)Test::kMODER_Mask_,
@@ -206,6 +207,22 @@ const uint32_t g_Value[] =
 	(uint32_t)Test::kAFRH_Mask_,
 	(uint32_t)Test::kAFRH_,
 };
+#else
+const uint32_t g_Value[] =
+{
+	(uint32_t)Test::kCRL_,
+	(uint32_t)Test::kCRL_Mask_,
+	(uint32_t)Test::kCRH_,
+	(uint32_t)Test::kCRH_Mask_,
+
+	(uint32_t)Test::kODR_,
+	(uint32_t)Test::kODR_Mask_,
+	(uint32_t)Test::kBitValue_,
+	(uint32_t)Test::kAfConf_,
+
+	(uint32_t)Test::kAfMask_,
+};
+#endif
 
 extern "C" void SystemInit()
 {
@@ -226,8 +243,8 @@ extern "C" void SystemInit()
 
 int main()
 {
-	//while ((void*)&g_Value[0] != (void*)0x1000) // Same as true: fools the linker to keep g_Value vector in ELF file
-	while (true) // Same as true: fools the linker to keep g_Value vector in ELF file
+	while ((void*)&g_Value[0] != (void*)0x1000) // Same as true: fools the linker to keep g_Value vector in ELF file
+	//while (true) // Same as true: fools the linker to keep g_Value vector in ELF file
 	{
 		// A reasonable delay to see the LED blinking
 		for(volatile int i = 0; i < 250000; ++i)

@@ -57,7 +57,7 @@ typedef Gpio::AnyPin<Gpio::Port::PA
 	, 1
 	, Gpio::Mode::kAnalog
 	, Gpio::Speed::kInput
-	, Gpio::PuPd::kPullDown
+	, Gpio::PuPd::kFloating
 	, Gpio::Level::kLow
 	, Gpio::AfJtag4
 > Test05;
@@ -73,7 +73,7 @@ typedef Gpio::AnyPin<Gpio::Port::PA
 	, 1
 	, Gpio::Mode::kAnalog
 	, Gpio::Speed::kInput
-	, Gpio::PuPd::kPullDown
+	, Gpio::PuPd::kFloating
 	, Gpio::Level::kHigh
 	, Gpio::AfSwd3
 > Test06;
@@ -301,7 +301,7 @@ static_assert(Test20::kCRL_ == 0x00000080, "Error computing CRL value");
 static_assert(Test20::kCRL_Mask_ == 0xffffff0f, "Error computing CRL Mask value");
 static_assert(Test20::kCRH_ == 0x00000000, "Error computing CRH value");
 static_assert(Test20::kCRH_Mask_ == 0xffffffff, "Error computing CRH Mask value");
-static_assert(Test20::kBitValue_ == 0x00000000, "Error computing BitValue value");
+static_assert(Test20::kODR_Mask_ == 0xfffd, "Error computing ODR mask value");
 static_assert(Test20::kODR_ == 0x00000002, "Error computing ODR value");
 static_assert(Test20::kAfConf_ == 0x00000000, "Error computing AfConf value");
 static_assert(Test20::kAfMask_ == 0xffffffff, "Error computing AfMask value");
@@ -314,7 +314,7 @@ static_assert(Test21::kCRL_ == 0x00000080, "Error computing CRL value");
 static_assert(Test21::kCRL_Mask_ == 0xffffff0f, "Error computing CRL Mask value");
 static_assert(Test21::kCRH_ == 0x00000000, "Error computing CRH value");
 static_assert(Test21::kCRH_Mask_ == 0xffffffff, "Error computing CRH Mask value");
-static_assert(Test21::kBitValue_ == 0x00000000, "Error computing BitValue value");
+static_assert(Test21::kODR_Mask_ == 0xfffd, "Error computing BitValue value");
 static_assert(Test21::kODR_ == 0x00000000, "Error computing ODR value");
 static_assert(Test21::kAfConf_ == 0x00000000, "Error computing AfConf value");
 static_assert(Test21::kAfMask_ == 0xffffffff, "Error computing AfMask value");
@@ -355,5 +355,5 @@ static_assert(Test50::kCRH_Mask_ == 0x00000000, "Error computing CRH Mask value"
 static_assert(Test50::kODR_ == 0x00000000, "Error computing ODR value");
 static_assert(Test50::kAfConf_ == 0x04000000, "Error computing AfConf value");
 static_assert(Test50::kAfMask_ == 0xf8ffffff, "Error computing AfMask value");
-static_assert(Test50::kBitValue_ == 0x00006100, "Error computing Bit Value value");
+static_assert(Test50::kODR_Mask_ == 0x0000, "Error computing Bit Value value");
 
