@@ -14,6 +14,19 @@
 			"servertype": "bmp",
 			"BMPGDBSerialPort": "COM6",
 			"svdPath": "${workspaceFolder}/SVD/STM32F103.svd"
+		},
+		{
+			"name": "Cortex Debug (JLink)",
+			"cwd": "${workspaceFolder}",
+			"executable": "./build/examples/01-clock-tree/01-clock-tree.elf",
+			"request": "launch",
+			"type": "cortex-debug",
+			"runToEntryPoint": "main",
+			"servertype": "jlink",
+			"interface": "swd",
+			"device": "STM32L432KC",
+			"serverpath": "C:/Program Files (x86)/SEGGER/JLink_V758e/JLinkGDBServerCL.exe",
+			"svdPath": "${workspaceFolder}/SVD/STM32L4x2.svd"
 		}
 	]
 }

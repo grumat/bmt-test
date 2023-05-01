@@ -118,7 +118,7 @@ static_assert(Test05::kPUPDR_Mask_ == 0x3fffffff, "Value of PUPDR register mask 
 static_assert(Test05::kBitValue_ == 0x00008000, "Value of Bit mask is invalid");
 static_assert(Test05::kBsrrValue_ == 0x80000000, "Value of BSSR register is invalid");
 static_assert(Test05::kODR_ == 0x00000000, "Value of ODR register is invalid");
-static_assert(Test05::kODR_Mask_ == 0xffffffff, "Value of ODR register mask is invalid");
+static_assert(Test05::kODR_Mask_ == 0xffff7fff, "Value of ODR register mask is invalid");
 static_assert(Test05::kAFRL_ == 0x00000000, "Value of AFRL register is invalid");
 static_assert(Test05::kAFRL_Mask_ == 0xffffffff, "Value of AFRL register mask is invalid");
 static_assert(Test05::kAFRH_ == 0x50000000, "Value of AFRH register is invalid");
@@ -144,7 +144,7 @@ static_assert(Test06::kPUPDR_Mask_ == 0x3fffffff, "Value of PUPDR register mask 
 static_assert(Test06::kBitValue_ == 0x00008000, "Value of Bit mask is invalid");
 static_assert(Test06::kBsrrValue_ == 0x80000000, "Value of BSSR register is invalid");
 static_assert(Test06::kODR_ == 0x00000000, "Value of ODR register is invalid");
-static_assert(Test06::kODR_Mask_ == 0xffffffff, "Value of ODR register mask is invalid");
+static_assert(Test06::kODR_Mask_ == 0xffff7fff, "Value of ODR register mask is invalid");
 static_assert(Test06::kAFRL_ == 0x00000000, "Value of AFRL register is invalid");
 static_assert(Test06::kAFRL_Mask_ == 0xffffffff, "Value of AFRL register mask is invalid");
 static_assert(Test06::kAFRH_ == 0x60000000, "Value of AFRH register is invalid");
@@ -170,9 +170,166 @@ static_assert(Test07::kPUPDR_Mask_ == 0x3fffffff, "Value of PUPDR register mask 
 static_assert(Test07::kBitValue_ == 0x00008000, "Value of Bit mask is invalid");
 static_assert(Test07::kBsrrValue_ == 0x80000000, "Value of BSSR register is invalid");
 static_assert(Test07::kODR_ == 0x00000000, "Value of ODR register is invalid");
-static_assert(Test07::kODR_Mask_ == 0xffffffff, "Value of ODR register mask is invalid");
+static_assert(Test07::kODR_Mask_ == 0xffff7fff, "Value of ODR register mask is invalid");
 static_assert(Test07::kAFRL_ == 0x00000000, "Value of AFRL register is invalid");
 static_assert(Test07::kAFRL_Mask_ == 0xffffffff, "Value of AFRL register mask is invalid");
 static_assert(Test07::kAFRH_ == 0xc0000000, "Value of AFRH register is invalid");
 static_assert(Test07::kAFRH_Mask_ == 0x0fffffff, "Value of AFRH register mask is invalid");
+
+typedef Gpio::AnyPin<
+	Gpio::Port::PA,
+	15,
+	Gpio::Mode::kOutput,
+	Gpio::Speed::kMedium,
+	Gpio::PuPd::kFloating,
+	Gpio::Level::kHigh,
+	Gpio::AfTIM2_CH1_PA15
+> Test08;
+static_assert(Test08::kMODER_ == 0x40000000, "Value of MODER register is invalid");
+static_assert(Test08::kMODER_Mask_ == 0x3fffffff, "Value of MODER register mask is invalid");
+static_assert(Test08::kOTYPER_ == 0x00000000, "Value of OTYPER register is invalid");
+static_assert(Test08::kOTYPER_Mask_ == 0xffff7fff, "Value of OTYPER register mask is invalid");
+static_assert(Test08::kOSPEEDR_ == 0x40000000, "Value of OSPEEDR register is invalid");
+static_assert(Test08::kOSPEEDR_Mask_ == 0x3fffffff, "Value of OSPEEDR register mask is invalid");
+static_assert(Test08::kPUPDR_ == 0x00000000, "Value of PUPDR register is invalid");
+static_assert(Test08::kPUPDR_Mask_ == 0x3fffffff, "Value of PUPDR register mask is invalid");
+static_assert(Test08::kBitValue_ == 0x00008000, "Value of Bit mask is invalid");
+static_assert(Test08::kBsrrValue_ == 0x80000000, "Value of BSSR register is invalid");
+static_assert(Test08::kODR_ == 0x00008000, "Value of ODR register is invalid");
+static_assert(Test08::kODR_Mask_ == 0xffff7fff, "Value of ODR register mask is invalid");
+static_assert(Test08::kAFRL_ == 0x00000000, "Value of AFRL register is invalid");
+static_assert(Test08::kAFRL_Mask_ == 0xffffffff, "Value of AFRL register mask is invalid");
+static_assert(Test08::kAFRH_ == 0x10000000, "Value of AFRH register is invalid");
+static_assert(Test08::kAFRH_Mask_ == 0x0fffffff, "Value of AFRH register mask is invalid");
+
+typedef Gpio::AnyPin<
+	Gpio::Port::PA,
+	15,
+	Gpio::Mode::kOutput,
+	Gpio::Speed::kFast,
+	Gpio::PuPd::kPullUp,
+	Gpio::Level::kHigh,
+	Gpio::AfTIM2_ETR_PA15
+> Test09;
+static_assert(Test09::kMODER_ == 0x40000000, "Value of MODER register is invalid");
+static_assert(Test09::kMODER_Mask_ == 0x3fffffff, "Value of MODER register mask is invalid");
+static_assert(Test09::kOTYPER_ == 0x00000000, "Value of OTYPER register is invalid");
+static_assert(Test09::kOTYPER_Mask_ == 0xffff7fff, "Value of OTYPER register mask is invalid");
+static_assert(Test09::kOSPEEDR_ == 0x80000000, "Value of OSPEEDR register is invalid");
+static_assert(Test09::kOSPEEDR_Mask_ == 0x3fffffff, "Value of OSPEEDR register mask is invalid");
+static_assert(Test09::kPUPDR_ == 0x40000000, "Value of PUPDR register is invalid");
+static_assert(Test09::kPUPDR_Mask_ == 0x3fffffff, "Value of PUPDR register mask is invalid");
+static_assert(Test09::kBitValue_ == 0x00008000, "Value of Bit mask is invalid");
+static_assert(Test09::kBsrrValue_ == 0x80000000, "Value of BSSR register is invalid");
+static_assert(Test09::kODR_ == 0x00008000, "Value of ODR register is invalid");
+static_assert(Test09::kODR_Mask_ == 0xffff7fff, "Value of ODR register mask is invalid");
+static_assert(Test09::kAFRL_ == 0x00000000, "Value of AFRL register is invalid");
+static_assert(Test09::kAFRL_Mask_ == 0xffffffff, "Value of AFRL register mask is invalid");
+static_assert(Test09::kAFRH_ == 0x20000000, "Value of AFRH register is invalid");
+static_assert(Test09::kAFRH_Mask_ == 0x0fffffff, "Value of AFRH register mask is invalid");
+
+typedef Gpio::AnyPin<
+	Gpio::Port::PA,
+	15,
+	Gpio::Mode::kOutput,
+	Gpio::Speed::kFast,
+	Gpio::PuPd::kPullDown,
+	Gpio::Level::kHigh,
+	Gpio::AfTSC_G3_IO1_PA15
+> Test10;
+static_assert(Test10::kMODER_ == 0x40000000, "Value of MODER register is invalid");
+static_assert(Test10::kMODER_Mask_ == 0x3fffffff, "Value of MODER register mask is invalid");
+static_assert(Test10::kOTYPER_ == 0x00000000, "Value of OTYPER register is invalid");
+static_assert(Test10::kOTYPER_Mask_ == 0xffff7fff, "Value of OTYPER register mask is invalid");
+static_assert(Test10::kOSPEEDR_ == 0x80000000, "Value of OSPEEDR register is invalid");
+static_assert(Test10::kOSPEEDR_Mask_ == 0x3fffffff, "Value of OSPEEDR register mask is invalid");
+static_assert(Test10::kPUPDR_ == 0x80000000, "Value of PUPDR register is invalid");
+static_assert(Test10::kPUPDR_Mask_ == 0x3fffffff, "Value of PUPDR register mask is invalid");
+static_assert(Test10::kBitValue_ == 0x00008000, "Value of Bit mask is invalid");
+static_assert(Test10::kBsrrValue_ == 0x80000000, "Value of BSSR register is invalid");
+static_assert(Test10::kODR_ == 0x00008000, "Value of ODR register is invalid");
+static_assert(Test10::kODR_Mask_ == 0xffff7fff, "Value of ODR register mask is invalid");
+static_assert(Test10::kAFRL_ == 0x00000000, "Value of AFRL register is invalid");
+static_assert(Test10::kAFRL_Mask_ == 0xffffffff, "Value of AFRL register mask is invalid");
+static_assert(Test10::kAFRH_ == 0x90000000, "Value of AFRH register is invalid");
+static_assert(Test10::kAFRH_Mask_ == 0x0fffffff, "Value of AFRH register mask is invalid");
+
+typedef Gpio::AnyPin<
+	Gpio::Port::PA,
+	15,
+	Gpio::Mode::kOutput,
+	Gpio::Speed::kFastest,
+	Gpio::PuPd::kPullDown,
+	Gpio::Level::kHigh,
+	Gpio::AfUSART2_RX_PA15
+> Test11;
+static_assert(Test11::kMODER_ == 0x40000000, "Value of MODER register is invalid");
+static_assert(Test11::kMODER_Mask_ == 0x3fffffff, "Value of MODER register mask is invalid");
+static_assert(Test11::kOTYPER_ == 0x00000000, "Value of OTYPER register is invalid");
+static_assert(Test11::kOTYPER_Mask_ == 0xffff7fff, "Value of OTYPER register mask is invalid");
+static_assert(Test11::kOSPEEDR_ == 0xc0000000, "Value of OSPEEDR register is invalid");
+static_assert(Test11::kOSPEEDR_Mask_ == 0x3fffffff, "Value of OSPEEDR register mask is invalid");
+static_assert(Test11::kPUPDR_ == 0x80000000, "Value of PUPDR register is invalid");
+static_assert(Test11::kPUPDR_Mask_ == 0x3fffffff, "Value of PUPDR register mask is invalid");
+static_assert(Test11::kBitValue_ == 0x00008000, "Value of Bit mask is invalid");
+static_assert(Test11::kBsrrValue_ == 0x80000000, "Value of BSSR register is invalid");
+static_assert(Test11::kODR_ == 0x00008000, "Value of ODR register is invalid");
+static_assert(Test11::kODR_Mask_ == 0xffff7fff, "Value of ODR register mask is invalid");
+static_assert(Test11::kAFRL_ == 0x00000000, "Value of AFRL register is invalid");
+static_assert(Test11::kAFRL_Mask_ == 0xffffffff, "Value of AFRL register mask is invalid");
+static_assert(Test11::kAFRH_ == 0x30000000, "Value of AFRH register is invalid");
+static_assert(Test11::kAFRH_Mask_ == 0x0fffffff, "Value of AFRH register mask is invalid");
+
+typedef Gpio::AnyPin<
+	Gpio::Port::PA,
+	15,
+	Gpio::Mode::kOpenDrain,
+	Gpio::Speed::kFastest,
+	Gpio::PuPd::kPullDown,
+	Gpio::Level::kHigh,
+	Gpio::AfEVENTOUT_PA15
+> Test12;
+static_assert(Test12::kMODER_ == 0x40000000, "Value of MODER register is invalid");
+static_assert(Test12::kMODER_Mask_ == 0x3fffffff, "Value of MODER register mask is invalid");
+static_assert(Test12::kOTYPER_ == 0x00008000, "Value of OTYPER register is invalid");
+static_assert(Test12::kOTYPER_Mask_ == 0xffff7fff, "Value of OTYPER register mask is invalid");
+static_assert(Test12::kOSPEEDR_ == 0xc0000000, "Value of OSPEEDR register is invalid");
+static_assert(Test12::kOSPEEDR_Mask_ == 0x3fffffff, "Value of OSPEEDR register mask is invalid");
+static_assert(Test12::kPUPDR_ == 0x80000000, "Value of PUPDR register is invalid");
+static_assert(Test12::kPUPDR_Mask_ == 0x3fffffff, "Value of PUPDR register mask is invalid");
+static_assert(Test12::kBitValue_ == 0x00008000, "Value of Bit mask is invalid");
+static_assert(Test12::kBsrrValue_ == 0x80000000, "Value of BSSR register is invalid");
+static_assert(Test12::kODR_ == 0x00008000, "Value of ODR register is invalid");
+static_assert(Test12::kODR_Mask_ == 0xffff7fff, "Value of ODR register mask is invalid");
+static_assert(Test12::kAFRL_ == 0x00000000, "Value of AFRL register is invalid");
+static_assert(Test12::kAFRL_Mask_ == 0xffffffff, "Value of AFRL register mask is invalid");
+static_assert(Test12::kAFRH_ == 0xf0000000, "Value of AFRH register is invalid");
+static_assert(Test12::kAFRH_Mask_ == 0x0fffffff, "Value of AFRH register mask is invalid");
+
+typedef Gpio::AnyPortSetup<
+	Gpio::Port::PA,
+	Gpio::Unused<0>,		// unused pin (input + pull-down)
+	Gpio::Unused<1>,		// unused pin (input + pull-down)
+	Gpio::Unused<2>,		// unused pin (input + pull-down)
+	Gpio::Unused<3>,		// unused pin (input + pull-down)
+	Gpio::Unused<4>,		// unused pin (input + pull-down)
+	Gpio::Unused<5>,		// unused pin (input + pull-down)
+	Gpio::Unused<6>,		// unused pin (input + pull-down)
+	Gpio::Unused<7>,		// unused pin (input + pull-down)
+	Gpio::MCO_PA8			// Alternate output for MCO signal
+> Test50;
+static_assert(Test50::kMODER_ == 0x00020000, "Value of MODER register is invalid");
+static_assert(Test50::kMODER_Mask_ == 0x00000000, "Value of MODER register mask is invalid");
+static_assert(Test50::kOTYPER_ == 0x00000000, "Value of OTYPER register is invalid");
+static_assert(Test50::kOTYPER_Mask_ == 0xfffffeff, "Value of OTYPER register mask is invalid");
+static_assert(Test50::kOSPEEDR_ == 0x00030000, "Value of OSPEEDR register is invalid");
+static_assert(Test50::kOSPEEDR_Mask_ == 0xfffcffff, "Value of OSPEEDR register mask is invalid");
+static_assert(Test50::kPUPDR_ == 0xaaa8aaaa, "Value of PUPDR register is invalid");
+static_assert(Test50::kPUPDR_Mask_ == 0x00000000, "Value of PUPDR register mask is invalid");
+static_assert(Test50::kODR_ == 0x00000000, "Value of ODR register is invalid");
+static_assert(Test50::kODR_Mask_ == 0xfffffeff, "Value of ODR register mask is invalid");
+static_assert(Test50::kAFRL_ == 0x00000000, "Value of AFRL register is invalid");
+static_assert(Test50::kAFRL_Mask_ == 0xffffffff, "Value of AFRL register mask is invalid");
+static_assert(Test50::kAFRH_ == 0x00000000, "Value of AFRH register is invalid");
+static_assert(Test50::kAFRH_Mask_ == 0xfffffff0, "Value of AFRH register mask is invalid");
 
