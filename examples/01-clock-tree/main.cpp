@@ -159,11 +159,30 @@ typedef Gpio::AnyPortSetup <
 // Perform many static validations
 #include "Validate.L432.h"
 
+#elif defined(STM32G431xx)
+
+// A data-type for the 48 MHz MSI clock
+typedef Clocks::AnyHsi16<> Hsi;		// 16MHz internal RC clock
+
+// A data-type for the clock tree
+typedef Clocks::AnySycClk <
+	//Pll,							// uses PLL for the clock tree
+	Hsi,							// uses HSI for the clock tree
+	Power::Mode::kRange1,			// Full Voltage for Max performance
+	Clocks::AhbPrscl::k1,			// AHB 8 MHz
+	Clocks::ApbPrscl::k2,			// APB1 4 Mhz
+	Clocks::ApbPrscl::k1,			// APB2 8 MHz
+	Clocks::SysClkOpts::kDefault,	// Do not deactivate clock
+	Clocks::Mco::kHsi16,			// output HSI16 to the MCO pin (48MHz/16 = 3MHz)
+	//Clocks::Mco::kPllClk,			// output PLL to the MCO pin (80MHz/16 = 5MHz)
+	Clocks::McoPrscl::k16			// CLK/16 for the MCO output is enough
+> SysClk;
+
 #else
 #error Unsupported configuration
 #endif
 
-#if 1
+#if 0
 typedef Gpio::AnyPortSetup<
 	Gpio::Port::PA,
 	Gpio::Unused<0>,		// unused pin (input + pull-down)
@@ -183,7 +202,7 @@ typedef Gpio::AnyPortSetup<
 	Gpio::SWCLK_PA14,		// SWD CLK pin (for debug)
 	Gpio::Unused<15>		// unused pin (input + pull-down)
 > Test;
-#else
+#elif 0
 typedef Gpio::Unchanged<1> Test;
 #endif
 
@@ -207,7 +226,7 @@ const uint32_t g_Value[] =
 	(uint32_t)Test::kAFRH_Mask_,
 	(uint32_t)Test::kAFRH_,
 };
-#else
+#elif 0
 const uint32_t g_Value[] =
 {
 	(uint32_t)Test::kCRL_,
@@ -229,9 +248,11 @@ extern "C" void SystemInit()
 	// Reset clock system before starting program
 	System::Init();
 	// Initialize Port A, B and C
+#if 0
 	InitPA::Init();
 	InitPB::Init();
 	InitPC::Init();
+#endif
 	/*
 	** BluePill: Initializes HSE, then PLL and the clock tree clock, including MCO output
 	** Nucleo32 L432KC: Initializes LSE, then increases MSI with LSE trimming, PLL, clock tree with MCO output
@@ -243,14 +264,16 @@ extern "C" void SystemInit()
 
 int main()
 {
-	while ((void*)&g_Value[0] != (void*)0x1000) // Same as true: fools the linker to keep g_Value vector in ELF file
-	//while (true) // Same as true: fools the linker to keep g_Value vector in ELF file
+	//while ((void*)&g_Value[0] != (void*)0x1000) // Same as true: fools the linker to keep g_Value vector in ELF file
+	while (true) // Same as true: fools the linker to keep g_Value vector in ELF file
 	{
 		// A reasonable delay to see the LED blinking
 		for(volatile int i = 0; i < 250000; ++i)
 			__NOP();
 		// Toggle the LED
+#if 0
 		Led::Toggle();
+#endif
 	}
 	return 0;
 }
