@@ -5,7 +5,7 @@ project(bmt-test LANGUAGES C CXX ASM VERSION 0.1.0)
 # my time and won't continue looking for similar solution in Ninja
 set(CMAKE_VERBOSE_MAKEFILE TRUE)
 
-# Set tis to true to use the BSP provided with VisualGDB; if not, then CubeMX should have all BSP installed
+# Set this to true to use the BSP provided with VisualGDB; if not, then CubeMX should have all BSP installed
 set(OPT_USE_VISUALGDB false)
 
 # Configure CPU flag according to target MCU
