@@ -28,5 +28,16 @@
 			"serverpath": "C:/Program Files (x86)/SEGGER/JLink_V758e/JLinkGDBServerCL.exe",
 			"svdPath": "${workspaceFolder}/SVD/STM32L4x2.svd"
 		}
+		{
+			"name": "Cortex Debug (STLink)",
+			"cwd": "${workspaceFolder}",
+			"executable": "./build/examples/01-clock-tree/01-clock-tree.elf",
+			"request": "launch",
+			"type": "cortex-debug",
+			"runToEntryPoint": "main",
+			"servertype": "stutil",
+			"device": "STM32L432KC",
+			"svdPath": "${workspaceFolder}/SVD/STM32G431xx.svd"
+		}
 	]
 }

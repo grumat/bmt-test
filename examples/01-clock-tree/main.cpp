@@ -85,14 +85,13 @@ const uint32_t g_Value[] =
 
 extern "C" void SystemInit()
 {
+	__NOP();
 	// Reset clock system before starting program
 	System::Init();
 	// Initialize Port A, B and C
-#if 0
 	InitPA::Init();
 	InitPB::Init();
 	InitPC::Init();
-#endif
 	/*
 	** BluePill: Initializes HSE, then PLL and the clock tree clock, including MCO output
 	** Nucleo32 L432KC: Initializes LSE, then increases MSI with LSE trimming, PLL, clock tree with MCO output
@@ -111,9 +110,7 @@ int main()
 		for(volatile int i = 0; i < 250000; ++i)
 			__NOP();
 		// Toggle the LED
-#if 0
 		Led::Toggle();
-#endif
 	}
 	return 0;
 }

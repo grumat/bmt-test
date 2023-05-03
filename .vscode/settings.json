@@ -25,6 +25,7 @@
 		"CMAKE_MAKE_PROGRAM": "C:/SysGcc/arm-eabi/bin/make.exe"
 	},
 	"cortex-debug.armToolchainPath": "C:/SysGcc/arm-eabi/bin",
+	"cortex-debug.stutilPath.windows": "${env:USERPROFILE}/bin/stlink-1.7.0-x86_64-w64-mingw32/bin/st-util.exe",
 	"cmake.ctest.parallelJobs": 0,
 	"cSpell.enableFiletypes": [
 		"markdown"
