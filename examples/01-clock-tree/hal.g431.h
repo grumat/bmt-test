@@ -10,18 +10,18 @@
 
 // A data-type for the 24 MHz HSE clock
 typedef Clocks::AnyHse<24000000UL> Hse;		// 24MHz HSE clock
-// Configure the PLL for 80 MHz
+// Configure the PLL for 150 MHz
 /*
-** This configuration uses a calculator to obtain 80MHz from 48MHz. Obtainend PLL values are:
+** This configuration uses a calculator to obtain 150MHz from 24MHz. Obtainend PLL values are:
 **		- PLLSCR:	0b03	(HSE)
 **		- PLLM:		0b001	(/2)
 **		- PLLN:		0x19	(*25)
 **		- PLLREN:	1		(PLLCLK output for the Cortex M4)
 **		- PLLR:		0b00	(/2)
-** Final frequency is 24MHz (/2) (*25) (/2) = 170MHz
+** Final frequency is 24MHz (/2) (*25) (/2) = 150MHz
 */
 typedef Clocks::AnyPll<
-	Hse								// link to 48MHz MSI clock
+	Hse								// link to 24MHz MSI clock
 	, 150000000UL					// Max is 150 MHz (without boost)
 	, Clocks::AutoRange1			// Full voltage range calculator
 > Pll;
