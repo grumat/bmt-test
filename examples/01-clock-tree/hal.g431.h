@@ -3,22 +3,40 @@
 /*
 ** Nucleo-G431KB
 ** https://www.st.com/en/evaluation-tools/nucleo-g431kb.html
+**
+** IMPORTANT! You have to short SB9 and SB10 jumpers for this example to 
+** work.
 */
 
-// A data-type for the 16 MHz HSI clock
-typedef Clocks::AnyHsi16<> Hsi;		// 16MHz internal RC clock
+// A data-type for the 24 MHz HSE clock
+typedef Clocks::AnyHse<24000000UL> Hse;		// 24MHz HSE clock
+// Configure the PLL for 80 MHz
+/*
+** This configuration uses a calculator to obtain 80MHz from 48MHz. Obtainend PLL values are:
+**		- PLLSCR:	0b03	(HSE)
+**		- PLLM:		0b001	(/2)
+**		- PLLN:		0x19	(*25)
+**		- PLLREN:	1		(PLLCLK output for the Cortex M4)
+**		- PLLR:		0b00	(/2)
+** Final frequency is 24MHz (/2) (*25) (/2) = 170MHz
+*/
+typedef Clocks::AnyPll<
+	Hse								// link to 48MHz MSI clock
+	, 150000000UL					// Max is 150 MHz (without boost)
+	, Clocks::AutoRange1			// Full voltage range calculator
+> Pll;
 
 // A data-type for the clock tree
 typedef Clocks::AnySycClk <
-	//Pll,							// uses PLL for the clock tree
-	Hsi,							// uses HSI for the clock tree
+	Pll,							// uses PLL for the clock tree
+	//Hse,							// uses HSE for the clock tree
 	Power::Mode::kRange1,			// Full Voltage for Max performance
-	Clocks::AhbPrscl::k1,			// AHB 8 MHz
-	Clocks::ApbPrscl::k2,			// APB1 4 Mhz
-	Clocks::ApbPrscl::k1,			// APB2 8 MHz
+	Clocks::AhbPrscl::k1,			// AHB 24 MHz
+	Clocks::ApbPrscl::k2,			// APB1 12 Mhz
+	Clocks::ApbPrscl::k1,			// APB2 24 MHz
 	Clocks::SysClkOpts::kDefault,	// Do not deactivate clock
-	Clocks::Mco::kHsi16,			// output HSI16 to the MCO pin (48MHz/16 = 3MHz)
-	//Clocks::Mco::kPllClk,			// output PLL to the MCO pin (80MHz/16 = 5MHz)
+	Clocks::Mco::kPllClk,			// output PLL to the MCO pin (150MHz/16 = 9.375MHz)
+	//Clocks::Mco::kHse,			// output HSE to the MCO pin (24MHz/16 = 1.5MHz)
 	Clocks::McoPrscl::k16			// CLK/16 for the MCO output is enough
 > SysClk;
 

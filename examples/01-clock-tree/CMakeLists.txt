@@ -5,7 +5,7 @@ include(CTest)
 enable_testing()
 ]]
 
-set(APP_NAME 01-clock-tree.elf)
+set(APP_NAME 01-clock-tree-${TARGET_MCU}.elf)
 
 message(STARTUP_FILE="${STARTUP_FILE}")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -T ${CMAKE_CURRENT_SOURCE_DIR}/${LINKER_SCRIPT}")

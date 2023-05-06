@@ -18,7 +18,7 @@
 	"C_Cpp.vcFormat.newLine.beforeOpenBrace.type": "newLine",
 	"C_Cpp.vcFormat.newLine.scopeBracesOnSeparateLines": true,
 	"cSpell.ignoreRegExpList": [
-		"\\b[A-Z0-9]+?\\b"
+		"\\b[A-Z0-9_]+?\\b"
 	],
 	"cmake.generator": "Unix Makefiles",
 	"cmake.configureSettings": {

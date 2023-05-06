@@ -1,7 +1,8 @@
 # <big>`01-clock-tree` Example</big>
 
 The purpose of this example is to demonstrate the clock tree setup of a 
-STM32xxxx MCU using the **bmt template library**.
+STM32xxxx MCU using the **bmt template library**. It also demonstrates 
+the use of the GPIO.
 
 # Template Library Concepts
 
