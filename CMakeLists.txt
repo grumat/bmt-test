@@ -35,3 +35,4 @@ include_directories (${BMT_PATH})
 add_compile_definitions(${TARGET_MCU})
 
 add_subdirectory(examples/01-clock-tree)
+add_subdirectory(examples/02-systick-delay)

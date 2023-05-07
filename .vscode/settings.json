@@ -18,8 +18,9 @@
 	"C_Cpp.vcFormat.newLine.beforeOpenBrace.type": "newLine",
 	"C_Cpp.vcFormat.newLine.scopeBracesOnSeparateLines": true,
 	"cSpell.ignoreRegExpList": [
-		"\\b[A-Z0-9_]+?\\b"
+		"/\\s[^a-z]+\\s/g"
 	],
+	"cSpell.caseSensitive": true,
 	"cmake.generator": "Unix Makefiles",
 	"cmake.configureSettings": {
 		"CMAKE_MAKE_PROGRAM": "C:/SysGcc/arm-eabi/bin/make.exe"
