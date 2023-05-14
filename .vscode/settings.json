@@ -31,4 +31,7 @@
 	"cSpell.enableFiletypes": [
 		"markdown"
 	],
+	"files.associations": {
+		"cstdlib": "cpp"
+	},
 }

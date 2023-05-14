@@ -7,7 +7,7 @@
 		{
 			"name": "Cortex Debug",
 			"cwd": "${workspaceFolder}",
-			"executable": "./build/examples/02-systick-delay/02-systick-delay-STM32F103xB.elf",
+			"executable": "./build/examples/03-gpio-lcd1602/03-gpio-lcd1602-STM32F103xB.elf",
 			"request": "launch",
 			"type": "cortex-debug",
 			"runToEntryPoint": "main",
@@ -18,7 +18,7 @@
 		{
 			"name": "Cortex Debug (JLink)",
 			"cwd": "${workspaceFolder}",
-			"executable": "./build/examples/02-systick-delay/02-systick-delay-STM32L432xx.elf",
+			"executable": "./build/examples/03-gpio-lcd1602/03-gpio-lcd1602-STM32L432xx.elf",
 			"request": "launch",
 			"type": "cortex-debug",
 			"runToEntryPoint": "main",
@@ -31,7 +31,7 @@
 		{
 			"name": "Cortex Debug (STLink)",
 			"cwd": "${workspaceFolder}",
-			"executable": "./build/examples/02-systick-delay/02-systick-delay-STM32G431xx.elf",
+			"executable": "./build/examples/03-gpio-lcd1602/03-gpio-lcd1602-STM32G431xx.elf",
 			"request": "launch",
 			"type": "cortex-debug",
 			"runToEntryPoint": "main",

@@ -84,7 +84,7 @@ void AdvancedUse()
 }
 
 /*
-This example illustrates the use of LongStopWatch, which supports a very 
+This example illustrates the use of PolledStopWatch, which supports a very 
 long interval, as long as IsNotElapsed() method is called within the 
 timer overflow period.
 */
@@ -93,7 +93,7 @@ void UseOfLongPeriods()
 	while (true)
 	{
 		// 60 seconds delay
-		Tick::LongStopWatch stopwatch(60000UL);
+		Tick::PolledStopWatch stopwatch(60000UL);
 		while (stopwatch.IsNotElapsed())
 		{
 			// TODO: Do other stuff while waiting for the period to update LED
