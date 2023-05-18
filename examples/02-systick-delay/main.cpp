@@ -55,9 +55,10 @@ void SimpleUse()
 {
 	while (true)
 	{
-		// A 350ms delay for each phase (LED blinks in a 700 ms blink rate)
-		Tick::StopWatch().Delay<350>();
-		__NOP();
+		// The following line attaches a temporary PolledStopWatch<> instance 
+		// to the 'Tick'  timer, initializes with 350 ms and halts CPU until 
+		// time has elapsed. This establishes a 700 ms LED period.
+		Timer::PolledStopWatch<Tick>(350).Wait();
 		// Toggle the LED
 		Led::Toggle();
 	}
@@ -72,8 +73,12 @@ void AdvancedUse()
 {
 	while (true)
 	{
-		Tick::StopWatch stopwatch;
-		while (stopwatch.GetElapsedTicks() < Tick::M2T<250>::kTicks)
+		// Attaches the 'Tick' timer to the 'stopwatch' instance and initializes 
+		// it with 350 ms. 
+		Timer::PolledStopWatch<Tick> stopwatch(350);
+		// A loop is established until this period elapses to perform any required 
+		// activity.
+		while (stopwatch.IsNotElapsed())
 		{
 			// TODO: Do other stuff while waiting for the period to update LED
 			__NOP();
@@ -93,7 +98,7 @@ void UseOfLongPeriods()
 	while (true)
 	{
 		// 60 seconds delay
-		Tick::PolledStopWatch stopwatch(60000UL);
+		Timer::PolledStopWatch<Tick> stopwatch(60000UL);
 		while (stopwatch.IsNotElapsed())
 		{
 			// TODO: Do other stuff while waiting for the period to update LED

@@ -5,7 +5,7 @@
 	"version": "0.2.0",
 	"configurations": [
 		{
-			"name": "Cortex Debug",
+			"name": "Cortex Debug #1 (BMP)",
 			"cwd": "${workspaceFolder}",
 			"executable": "./build/examples/03-gpio-lcd1602/03-gpio-lcd1602-STM32F103xB.elf",
 			"request": "launch",
@@ -29,7 +29,18 @@
 			"svdPath": "${workspaceFolder}/SVD/STM32L4x2.svd"
 		},
 		{
-			"name": "Cortex Debug (STLink)",
+			"name": "Cortex Debug #2 (STLink)",
+			"cwd": "${workspaceFolder}",
+			"executable": "./build/examples/03-gpio-lcd1602/03-gpio-lcd1602-STM32L432xx.elf",
+			"request": "launch",
+			"type": "cortex-debug",
+			"runToEntryPoint": "main",
+			"servertype": "stlink",
+			"device": "STM32G431C6",
+			"svdPath": "${workspaceFolder}/SVD/STM32G431xx.svd"
+		}
+		{
+			"name": "Cortex Debug #3 (STLink)",
 			"cwd": "${workspaceFolder}",
 			"executable": "./build/examples/03-gpio-lcd1602/03-gpio-lcd1602-STM32G431xx.elf",
 			"request": "launch",

@@ -58,7 +58,7 @@ typedef Gpio::AnyPortSetup <
 	Gpio::Unused<11>,		// unused pin (input + pull-down)
 	Gpio::Unused<12>,		// unused pin (input + pull-down)
 	Led,					// LED on PC13
-	Gpio::Unchanged<14>,	// HSE here
+	Gpio::Unchanged<14>,
 	Gpio::Unchanged<15>
 > InitPC;
 

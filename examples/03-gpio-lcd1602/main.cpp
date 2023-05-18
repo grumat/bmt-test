@@ -19,7 +19,7 @@ using namespace Bmt::Kits::Lcd1602;
 // The data-type representing the system tick timer
 typedef Timer::AnyDelay<SysClk> Delay;
 typedef Timer::SysTickCounter<SysClk> Tick;
-typedef AnyLcd1602<Delay, Tick::PolledStopWatch, Gpio::Port::PA> Lcd;
+typedef AnyLcd1602<Delay, Timer::MicroStopWatch<Tick>, Gpio::Port::PA> Lcd;
 
 
 /*
@@ -28,7 +28,6 @@ initial startup.
 */
 extern "C" void SystemInit()
 {
-	__NOP();
 	// Reset clock system before starting program
 	System::Init();
 	// Initialize Port A, B and C
@@ -92,11 +91,14 @@ void WriteElapsedTime(Lcd &lcd, unsigned int v)
 
 int main()
 {
+#if 0
+	// A 100 millisecond timer
+	Timer::PolledStopWatch<Tick> t(100);
+	//t.Wait();
 	Lcd lcd;
-	lcd.Init();
+	lcd.InitLcd();
 	lcd.Write("Hello World!");
-	// A 100 second timer
-	Tick::PolledStopWatch t(100);
+	// t.Append(100);
 	unsigned int v = 0;
 	// Display duration forever
 	while (true)
@@ -110,6 +112,73 @@ int main()
 		// Increment 100 ms counter
 		++v;
 	}
+#else
+	typedef Gpio::AnyOut<Gpio::Port::PA, 1> RS;
+	typedef Gpio::AnyOut<Gpio::Port::PA, 2> RW;
+	typedef Gpio::AnyOut<Gpio::Port::PA, 3> EN;
+
+	RS::SetHigh();
+	RW::SetHigh();
+	// A 100 second timer
+	Timer::PolledStopWatch<Tick> t(100);
+	while (true)
+	{
+		EN::SetHigh();
+		__NOP();
+		EN::SetLow();
+		__NOP();
+		EN::SetHigh();
+		__NOP();
+		EN::SetLow();
+		__NOP();
+		EN::SetHigh();
+		__NOP();
+		__NOP();
+		EN::SetLow();
+		__NOP();
+		__NOP();
+		EN::SetHigh();
+		__NOP();
+		__NOP();
+		EN::SetLow();
+		__NOP();
+		__NOP();
+		EN::SetHigh();
+		__NOP();
+		__NOP();
+		__NOP();
+		__NOP();
+		EN::SetLow();
+		__NOP();
+		__NOP();
+		__NOP();
+		__NOP();
+		EN::SetHigh();
+		__NOP();
+		__NOP();
+		__NOP();
+		__NOP();
+		EN::SetLow();
+		__NOP();
+		__NOP();
+		__NOP();
+		__NOP();
+		EN::SetHigh();
+		// long loop
+		uint32_t cycles = 1000;
+		asm volatile (
+			"1:  subs %[cycles], %[cycles], #1 \n"
+			"    bne 1b \n"
+			: [cycles] "+r"(cycles)
+			);
+		EN::SetLow();
+
+		t.Wait();
+		// Append 100 ms to the stopwatch to schedule next update
+		t.Append(100);
+	}
+
+#endif
 	return 0;
 }
 
