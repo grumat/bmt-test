@@ -85,7 +85,6 @@ void WriteElapsedTime(Lcd &lcd, unsigned int v)
 
 int main()
 {
-#if 1
 	// A 100 millisecond timer
 	Timer::PolledStopWatch<Tick> t(100);
 	//t.Wait();
@@ -106,73 +105,6 @@ int main()
 		// Increment 100 ms counter
 		++v;
 	}
-#else
-	typedef Gpio::AnyOut<Gpio::Port::PA, 1> RS;
-	typedef Gpio::AnyOut<Gpio::Port::PA, 2> RW;
-	typedef Gpio::AnyOut<Gpio::Port::PA, 0> EN;
-
-	RS::SetHigh();
-	RW::SetHigh();
-	// A 100 second timer
-	Timer::PolledStopWatch<Tick> t(100);
-	while (true)
-	{
-		EN::SetHigh();
-		__NOP();
-		EN::SetLow();
-		__NOP();
-		EN::SetHigh();
-		__NOP();
-		EN::SetLow();
-		__NOP();
-		EN::SetHigh();
-		__NOP();
-		__NOP();
-		EN::SetLow();
-		__NOP();
-		__NOP();
-		EN::SetHigh();
-		__NOP();
-		__NOP();
-		EN::SetLow();
-		__NOP();
-		__NOP();
-		EN::SetHigh();
-		__NOP();
-		__NOP();
-		__NOP();
-		__NOP();
-		EN::SetLow();
-		__NOP();
-		__NOP();
-		__NOP();
-		__NOP();
-		EN::SetHigh();
-		__NOP();
-		__NOP();
-		__NOP();
-		__NOP();
-		EN::SetLow();
-		__NOP();
-		__NOP();
-		__NOP();
-		__NOP();
-		EN::SetHigh();
-		// long loop
-		uint32_t cycles = 1000;
-		asm volatile (
-			"1:  subs %[cycles], %[cycles], #1 \n"
-			"    bne 1b \n"
-			: [cycles] "+r"(cycles)
-			);
-		EN::SetLow();
-
-		t.Wait();
-		// Append 100 ms to the stopwatch to schedule next update
-		t.Append(100);
-	}
-
-#endif
 	return 0;
 }
 
