@@ -16,12 +16,6 @@ using namespace Bmt::Kits::Lcd1602;
 #endif
 
 
-// The data-type representing the system tick timer
-typedef Timer::AnyDelay<SysClk> Delay;
-typedef Timer::SysTickCounter<SysClk> Tick;
-typedef AnyLcd1602<Delay, Timer::MicroStopWatch<Tick>, Gpio::Port::PA> Lcd;
-
-
 /*
 This function is required by STM32 startup file and called during
 initial startup.
@@ -91,7 +85,7 @@ void WriteElapsedTime(Lcd &lcd, unsigned int v)
 
 int main()
 {
-#if 0
+#if 1
 	// A 100 millisecond timer
 	Timer::PolledStopWatch<Tick> t(100);
 	//t.Wait();
@@ -115,7 +109,7 @@ int main()
 #else
 	typedef Gpio::AnyOut<Gpio::Port::PA, 1> RS;
 	typedef Gpio::AnyOut<Gpio::Port::PA, 2> RW;
-	typedef Gpio::AnyOut<Gpio::Port::PA, 3> EN;
+	typedef Gpio::AnyOut<Gpio::Port::PA, 0> EN;
 
 	RS::SetHigh();
 	RW::SetHigh();

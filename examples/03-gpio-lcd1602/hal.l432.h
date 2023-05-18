@@ -59,3 +59,9 @@ typedef Gpio::AnyPortSetup <
 	Gpio::Port::PC
 > InitPC;
 
+
+// The data-type representing the system tick timer
+typedef Timer::AnyDelay<SysClk> Delay;
+typedef Timer::SysTickCounter<SysClk> Tick;
+typedef AnyLcd1602<Delay, Timer::MicroStopWatch<Tick>, Gpio::Port::PA> Lcd;
+
