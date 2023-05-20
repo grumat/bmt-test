@@ -15,6 +15,11 @@ using namespace Bmt;
 
 // The data-type representing the system tick timer
 typedef Timer::SysTickCounter<SysClk> Tick;
+// This is the model that expands resolution of the Tick counter to 32-bit, 
+// but requires moderate polling rates
+typedef Timer::MicroStopWatch<Tick> Tick32;
+// This is the model with more capabilities
+typedef Timer::PolledStopWatch<Tick> StopWatch;
 
 
 /*
@@ -55,10 +60,9 @@ void SimpleUse()
 {
 	while (true)
 	{
-		// The following line attaches a temporary PolledStopWatch<> instance 
-		// to the 'Tick'  timer, initializes with 350 ms and halts CPU until 
-		// time has elapsed. This establishes a 700 ms LED period.
-		Timer::PolledStopWatch<Tick>(350).Wait();
+		// In this example we use a simple delay for constant value. The method is 
+		// embedded into the system tick timer class.
+		Tick::Delay<Timer::Msec(350)>();
 		// Toggle the LED
 		Led::Toggle();
 	}
@@ -67,7 +71,8 @@ void SimpleUse()
 
 /*
 This is a use case that is usually more useful, since you can do something while
-your time has not elapsed.
+your time has not elapsed. Besides, as long as a moderate polling rate is granted 
+the MicroStopWatch<>() instance expands the resolution to 32-bit values.
 */
 void AdvancedUse()
 {
@@ -75,7 +80,7 @@ void AdvancedUse()
 	{
 		// Attaches the 'Tick' timer to the 'stopwatch' instance and initializes 
 		// it with 350 ms. 
-		Timer::PolledStopWatch<Tick> stopwatch(350);
+		Tick32 stopwatch(Timer::Msec(350));
 		// A loop is established until this period elapses to perform any required 
 		// activity.
 		while (stopwatch.IsNotElapsed())
@@ -91,14 +96,14 @@ void AdvancedUse()
 /*
 This example illustrates the use of PolledStopWatch, which supports a very 
 long interval, as long as IsNotElapsed() method is called within the 
-timer overflow period.
+timer overflow period. Though, this model is limited to milliseconds resolution.
 */
 void UseOfLongPeriods()
 {
 	while (true)
 	{
 		// 60 seconds delay
-		Timer::PolledStopWatch<Tick> stopwatch(60000UL);
+		StopWatch stopwatch(Timer::Msec(60000UL));
 		while (stopwatch.IsNotElapsed())
 		{
 			// TODO: Do other stuff while waiting for the period to update LED

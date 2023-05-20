@@ -1,4 +1,4 @@
-# <big>`02-systick-delay` Example</big>
+# <big>`03-gpio-lcd1602` Example</big>
 
 The purpose of this example is to demonstrate the timing control using 
 the SYSTICK timer.
@@ -14,6 +14,11 @@ For lower CPU clocks very long delays are possible. But the `Delay()`
 method is able to overcome the 24-bit limitation of the timer in case 
 a very long delay is needed and the SYSCLK is very high.
 
+![sch.f103.svg](sch.f103.svg)
+
+![sch.l432.svg](sch.l432.svg)
+
+![sch.g431.svg](sch.g431.svg)
 
 ## Type Declaration
 
