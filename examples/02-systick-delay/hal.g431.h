@@ -16,6 +16,11 @@ typedef Clocks::AnySycClk <
 	Hse						// Uses HSE for the clock tree
 > SysClk;
 
+// Types for experiment 4
+typedef Gpio::AnyOut<Gpio::Port::PA, 5> LedB;
+typedef Gpio::AnyOut<Gpio::Port::PA, 6> LedG;
+typedef Gpio::AnyOut<Gpio::Port::PA, 7> LedR;
+
 // A data-type to setup the Port A GPIO
 typedef Gpio::AnyPortSetup<
 	Gpio::Port::PA,
@@ -24,9 +29,9 @@ typedef Gpio::AnyPortSetup<
 	Gpio::Unused<2>,		// unused pin (input + pull-down)
 	Gpio::Unused<3>,		// unused pin (input + pull-down)
 	Gpio::Unused<4>,		// unused pin (input + pull-down)
-	Gpio::Unused<5>,		// unused pin (input + pull-down)
-	Gpio::Unused<6>,		// unused pin (input + pull-down)
-	Gpio::Unused<7>,		// unused pin (input + pull-down)
+	LedB,					// B signal of RGB LED for experiment 4
+	LedG,					// G signal of RGB LED for experiment 4
+	LedR,					// R signal of RGB LED for experiment 4
 	Gpio::Unused<8>,		// unused pin (input + pull-down)
 	Gpio::Unused<9>,		// unused pin (input + pull-down)
 	Gpio::Unused<10>,		// unused pin (input + pull-down)

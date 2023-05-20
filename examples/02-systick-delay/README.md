@@ -292,6 +292,61 @@ void UseOfLongPeriods()
 Please note that this class limits the measurement of times in the 
 millisecond resolution.
 
+
+## 4) Multiple Instances with Different Time Bases
+
+> This example requires the use of a RGB LED on pins 5, 6 and 7 of port A. 
+
+This is the schematics:
+
+![sch.f103.svg](sch.f103.svg)
+
+> I recommend the use of a RGB LED breakout from one of those 
+> *sensor boxes* found on web-shops.
+
+This example introduces an additional feature of the `MicroStopWatch<>` 
+template class. A second constant argument determines the tick count 
+value for the desired period. Besides initializing the stopwatch with the 
+given period, it auto-reloads this period when the time elapses.
+
+```cpp
+/*
+This example illustrates an additional feature of the MicroStopWatch<> 
+class. A second template parameter can be defined to establish a constant 
+auto-reload feature.
+This example requires an RGB LED on the PA5, PA6 and PA7 pins.
+*/
+void TestRGB()
+{
+	// Establish intervals using prime numbers to establish a reasonable 
+	// random behavior of the colors.
+	Timer::MicroStopWatch<Tick, Tick::ToTicks(Timer::Msec(607))> stopwatch_r;
+	Timer::MicroStopWatch<Tick, Tick::ToTicks(Timer::Msec(601))> stopwatch_g;
+	Timer::MicroStopWatch<Tick, Tick::ToTicks(Timer::Msec(613))> stopwatch_b;
+	// Loop until something changes
+	while (true)
+	{
+		if (!stopwatch_r.IsNotElapsed())
+			LedR::Toggle();	// toggle R LED (timer will auto-reload)
+		if (!stopwatch_g.IsNotElapsed())
+			LedG::Toggle();	// toggle G LED (timer will auto-reload)
+		if (!stopwatch_b.IsNotElapsed())
+			LedB::Toggle();	// toggle B LED (timer will auto-reload)
+	}
+}
+```
+
+The auto-reload feature is achieved during the call to `IsNotElapsed()`.
+Before the function returns the `false` value (i.e. the stopwatch reaches 
+the programed tick value), a new period with the same duration is added.
+
+> Note that the template argument with the period needs to be supplied in 
+> timer ticks. Because we want to operate in physical time scale we use 
+> the `ToTicks()` method of the timer to convert milliseconds to ticks.  
+> Again, `ToTicks()`  is a `constexpr` method and compiler translates the 
+> formula to a constant value during compile time.
+
+
 # Exercise Proposals
 
 Below follows some interesting exercise to be done.
@@ -303,7 +358,7 @@ Connect a frequency counter or oscilloscope and change timer period.
 Check in the measurement device how precise can be this intervals.
 
 
-## 2) Microseconds resolution
+## 2) Microseconds Resolution
 
 Similar as previous exercise, try the `Delay()` method using 
 `Timer::Usec` units for short periods measured in microseconds. 
@@ -312,30 +367,7 @@ Similar as previous exercise, try the `Delay()` method using
 > devices that imposes latencies for correct access, like a display. 
 
 
-## 3) Two Instances with Different Time Bases
-
-Select any desired GPIO and configure it as output. Connect a LED or 
-measurement device.
-
-Make two instances of `MicroStopWatch` with different duration and modify 
-the logic so that each instance toggles a different output.
-
-For this exercise you will need to *continue* each instance after the 
-toggle. For this use the `MicroStopWatch::Append()` method.
-
-Important to note here is that the design of `MicroStopWatch::Append()` 
-does not resets the time base, as opposed to `MicroStopWatch::Restart()`, 
-which means that no accumulated time shift error will happen when you 
-continually *continues* the instance.
-
-Lets explain: If one uses `MicroStopWatch::Restart()` a new time 
-reference is sampled, which means that any tick counted between the last 
-call of `IsNotElapsed()` and `Restart()` will shift the time slightly 
-increasing the period. This is critical in a timer that runs in several 
-MHz for cyclic phenomenon.
-
-
-## 4) New Clock Frequencies
+## 3) New Clock Frequencies
 
 Modify your clock chain and activate the PLL as system clock. Consider 
 experimenting diverse supported PLL frequency.

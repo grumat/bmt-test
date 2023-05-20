@@ -47,6 +47,8 @@ enum class ExampleType
 	kSimple,	// Simple delay block to blink LED on a controlled period
 	kAdvanced,	// Allows other activities while waiting foi period elapse
 	kVeryLong,	// Example for very long durations, compensating timer overflows
+	kRGB,		// Test RGB LED on PA5, PA6, PA7
+	kLast_
 };
 
 // Please select one of the example type
@@ -115,19 +117,47 @@ void UseOfLongPeriods()
 }
 
 
+/*
+This example illustrates an additional feature of the MicroStopWatch<> class.
+A second template parameter can be defined to establish a constant auto-reload 
+feature.
+This example requires an RGB LED on the PA5, PA6 and PA7 pins.
+*/
+void TestRGB()
+{
+	// Establish intervals using prime numbers to establish a reasonable random 
+	// behavior of the LED.
+	Timer::MicroStopWatch<Tick, Tick::ToTicks(Timer::Msec(607))> stopwatch_r;
+	Timer::MicroStopWatch<Tick, Tick::ToTicks(Timer::Msec(601))> stopwatch_g;
+	Timer::MicroStopWatch<Tick, Tick::ToTicks(Timer::Msec(613))> stopwatch_b;
+	// Loop until something changes
+	while (true)
+	{
+		if (!stopwatch_r.IsNotElapsed())
+			LedR::Toggle();	// toggle R LED (timer will auto-reload)
+		if (!stopwatch_g.IsNotElapsed())
+			LedG::Toggle();	// toggle G LED (timer will auto-reload)
+		if (!stopwatch_b.IsNotElapsed())
+			LedB::Toggle();	// toggle B LED (timer will auto-reload)
+	}
+}
+
+
 int main()
 {
 	// Hey don't trick me!!!
 	static_assert(kExample >= ExampleType::kSimple
-		&& kExample <= ExampleType::kVeryLong
+		&& kExample < ExampleType::kLast_
 		, "Invalid example was selected");
 
 	if (kExample == ExampleType::kSimple)
 		SimpleUse();
 	else if (kExample == ExampleType::kAdvanced)
 		AdvancedUse();
-	else
+	else if (kExample == ExampleType::kVeryLong)
 		UseOfLongPeriods();
+	else //if (kExample == ExampleType::kRGB)
+		TestRGB();
 	return 0;
 }
 
