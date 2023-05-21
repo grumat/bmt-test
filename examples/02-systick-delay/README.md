@@ -367,7 +367,7 @@ Similar as previous exercise, try the `Delay()` method using
 > devices that imposes latencies for correct access, like a display. 
 
 
-## 3) New Clock Frequencies
+## 3) New System Clock Frequencies
 
 Modify your clock chain and activate the PLL as system clock. Consider 
 experimenting diverse supported PLL frequency.

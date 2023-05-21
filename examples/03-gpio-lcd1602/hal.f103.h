@@ -6,8 +6,10 @@ STM32F103 BluePill
 
 // A data-type for the 8 MHz HSE clock
 typedef Clocks::AnyHse<> Hse;	// BluePill has a 8MHz XTAL
+#if 0 // one can experiment to change the SysClk frequency. New timing is adjusted automatically
 // Configure the PLL for 72 MHz
 typedef Clocks::AnyPll<Hse, 16000000UL> Pll;	// default 8MHz HSE clock
+#endif
 
 // A data-type for the clock tree
 typedef Clocks::AnySycClk <

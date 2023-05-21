@@ -12,7 +12,7 @@ using namespace Bmt::Kits::Lcd1602;
 #elif defined(STM32G431xx)
 #	include "hal.g431.h"
 #else
-#error Unsupported configuration
+#	error Unsupported configuration
 #endif
 
 
@@ -85,23 +85,24 @@ void WriteElapsedTime(Lcd &lcd, unsigned int v)
 
 int main()
 {
-	// A 100 millisecond timer
-	Timer::PolledStopWatch<Tick> t(100);
-	//t.Wait();
+	// A 100 millisecond timer used to update current time (auto-reload mode)
+	Timer::MicroStopWatch<Tick, Tick::ToTicks(Timer::Msec(100))> t;
+	
+	// Instance of the LCD1602
 	Lcd lcd;
+	// Initialize LCD controller
 	lcd.InitLcd();
+	// Write static text on the first line
 	lcd.Write("Hello World!");
-	// t.Append(100);
 	unsigned int v = 0;
 	// Display duration forever
 	while (true)
 	{
+		// Update second line
 		WriteElapsedTime(lcd, v);
 		// Now wait until stopwatch overflows
 		while (t.IsNotElapsed())
 			lcd.IsLocked();	// 'ping' internal timer
-		// Append 100 ms to the stopwatch to schedule next update
-		t.Append(100);
 		// Increment 100 ms counter
 		++v;
 	}
