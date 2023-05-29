@@ -3,11 +3,17 @@
 The purpose of this example is to demonstrate the Lcd1602 class provided 
 as an accessory on the **kits** folder.
 
+This example will cover the GPIO and the some details on how to produce 
+short delays to synchronize with hardware that is slower than your CPU.  
+These details will be covered later.
+
 
 ## General schematics
 
-The following pictures illustrates the schematics depending on your MCU 
-type. 
+The class Lcd1602 presented on this example interfaces a typical 16x02 
+LCD display using a 4-bit data bus option.  
+The following pictures illustrates the setup  or schematics, which 
+depends on your MCU type. 
 
 
 ### STM32F103 BluePill
@@ -17,10 +23,36 @@ LCD1602:
 
 ![sch.f103.svg](sch.f103.svg)
 
+In general the following connections are required:
+
+| MCU Port | LCD1602 Pin Label |
+|:--------:|:-----------------:|
+|   PA1    | RS                |
+|   PA2    | R/W               |
+|   PA3    | E                 |
+|   PA4    | DB4               |
+|   PA5    | DB5               |
+|   PA6    | DB6               |
+|   PA7    | DB7               |
+
+Other necessary connections are:
+- **Vo:** a 10K trimmer used to calibrate the display intensity.
+- **LEDA:** An optional 100R resistor. In most boards the resistor is 
+provided embedded into de display hardware. Keep the resistor if you are 
+not sure. This function controls the backlight.
+- **LEDK:** Connect this to the ground.
+- **VDD:** Supply voltage. Connect this to the 3.3V.
+- **VSS:** Connect this to the ground.
+
+> Note that RS and R/W are placed in a ascending sequence and the same is 
+> also valid for DB4 - DB7. The reason will be explained later when we 
+> dive into implementation details.
+
 
 ### Nucleo-L432KC
 
-Very similar to the BluePill, this is the schematics for this setup:
+This is identical to the BluePill but another form factor; this is the 
+schematics for this setup:
 
 ![sch.l432.svg](sch.l432.svg)
 
@@ -36,10 +68,6 @@ function.
 > **SB9** and **SB10** are closed.
 
 ![sch.g431.svg](sch.g431.svg)
-
-It is recommended to take a look at the implementation of this class to 
-check how fine timing synchronization of faster CPU is made to access 
-slower hardware
 
 
 ## Include File
@@ -59,7 +87,7 @@ using namespace Bmt::Kits::Lcd1602;
 ```
 
 
-## Data-Types for the Display
+## Data-Types for the Project Implementation
 
 Like all previous examples a clock tree is necessary, which is 
 conventionally called `SysClk`. Also GPIO is required. All these types 
@@ -93,13 +121,10 @@ following types are defined:
 | `Tick`    | Class for longer delays                                 |
 | `Lcd`     | Data-type that drives the LCD1602 hardware              |
 
-> Other *HAL* files have similar contents.
+> **Note 1:** Other *HAL* files have similar contents.
 
-For details on the clock tree you should check example **1)** and **2)**. 
-
-This example will cover the GPIO and the some details on how to produce 
-short delays to synchronize with hardware that is slower than your CPU.  
-These details will be covered later.
+> **Note 2:** For details on the clock tree you should check example 
+> **1)** and **2)**. 
 
 
 
@@ -142,5 +167,195 @@ extern "C" void SystemInit()
 # General Description of the Example Functionality
 
 This example does the following:
-- Creates an instance of the PolledStopWatch<> class
+- Creates an instance of the MicroStopWatch<> class to control up-counter 
+
+```cpp
+// A 100 millisecond timer used to update current time (auto-reload mode)
+Timer::MicroStopWatch<Tick, Tick::ToTicks(Timer::Msec(100))> t;
+```
+
 - Creates an instance of the LCD1602 class and initialize it.
+
+```cpp
+// Instance of the LCD1602
+Lcd lcd;
+// Initialize LCD controller
+lcd.InitLcd();
+```
+
+- Writes the *"Hello World!"* message on the first line. This line 
+remains static during runtime.
+
+```cpp
+// Write static text on the first line
+lcd.Write("Hello World!");
+```
+
+- A counter starting with 0 is initialized. This is the total amount of 
+tenths of a second passed since the start of the program.
+
+```cpp
+unsigned int v = 0;
+```
+
+- An infinite loop is established, performing the following steps:
+  - Calls the `WriteElapsedTime()` function to update the second line the 
+  value of the counter
+  - Halts MCU as long as the programmed interval does not overflows.
+  - Meanwhile, for every timer overflow, check the internal LCD 
+  `IsLocked()` method to update internal timers. Later we will discuss 
+  why this was done.
+  - After the timer period overflows, the counter variable is incremented 
+  registering the next tenth of a second. The infinite loop repeats after 
+  this step.
+
+```cpp
+// Display duration forever
+while (true)
+{
+    // Update second line
+    WriteElapsedTime(lcd, v);
+    // Now wait until stopwatch overflows
+    while (t.IsNotElapsed())
+        lcd.IsLocked();	// 'ping' internal timer
+    // Increment 100 ms counter
+    ++v;
+}
+```
+
+
+## Comments and Tricks
+
+Consider the following points:
+
+
+### Call Rate for the `IsLocked()` method
+
+This requirement is covered in detail on the previous example, where four 
+different timer approaches are covered.
+
+In general, the reason is that these polled timers have to be *checked* 
+on a rate higher than the system tick timer overflow period, in this way 
+we can increase the resolution of the tick value to 32 bits, allowing for 
+longer periods.
+
+> The call rate in this particular example is far higher then the 
+> necessary. This is simply because we have no other activity to do, due 
+> to the simplicity of the example. The interval between two consecutive 
+> calls could be larger (i.e. less calls per seconds); the only important 
+> requirement is that the call rate is higher than the period of the 
+> system tick timer, quite similar to an application using a watchdog, 
+> that needs to touch the peripheral unit before it counter reaches the 
+> programmed period.
+
+
+### Printing of the Second Line
+
+The printing of the second line is implemented in `WriteElapsedTime()`.
+
+In this example we establish a 32-bit counter that increments every 
+**100 ms**. When printing, standard integer conversion is performed using 
+the `__utoa()` function. Then the floating point '.' separator is 
+inserted into that buffer.
+
+```cpp
+// Format counter to decimal value
+__utoa(v, buf, 10);
+// Move last digit one position away
+l = strlen(buf);
+buf[l] = buf[l - 1];
+// insert decimal dot
+buf[l - 1] = '.';
+// Update string size and add terminator
+buf[++l] = 0;
+```
+
+Last but not least, the output is computed so that a right alignment is 
+obtained and *seconds* units is appended to the tail.
+
+```cpp
+// Compute padding required for move text to the right margin
+l = 14 - l;
+// prepend spaces
+while (l--)
+    lcd.Write(' ');
+// Write string with current time
+lcd.Write(buf);
+// Add time unit
+lcd.Write(' ');
+lcd.Write('s');
+```
+
+Another particularity of this function is that counter values between 
+**0** and **9**. If we pass a value in that range into the solution 
+presented above you would obtain outputs like:
+- `.0`
+- `.1`
+- ...
+- `.9`
+
+To avoid this phenomenon a special case was added for this range:
+```cpp
+// Values below 10 are special: prepend '0' for fake floating point
+if (v < 10)
+{
+    // Produces "0.0", "0.1", ..., "0.9"
+    buf[0] = '0';
+    buf[1] = '.';
+    buf[2] = (char)('0' + v);
+    buf[3] = 0;
+    l = 3;	// length of the printable string
+}
+else
+{
+    // as already showed, use utoa() to convert value
+    // ...
+}
+```
+
+> One typical recommendation is to try to use integers instead of a 
+> floating point. This rule is even more important on embedded 
+> development, where a FPU is rarely available. Computing of FP math 
+> consume much more resources than simple integer operations.  
+> Even for a Cortex-M4 with FPU, you are limited to single precision and 
+> according to IEEE754, single precision uses a mantissa of 23 bits. In 
+> other words, a 32-bit integer will have more computing room for a 
+> counter implementation.
+
+
+# Interfacing MCU with slower hardware
+
+## Timing of the HD44780U controller chip
+
+![images/hd44780u.svg](images/hd44780u.svg)
+
+```
+@startuml hd44780u
+concise "RS" as RS
+binary "RW" as RW
+binary "E" as E
+concise "DB0 to DB7" as DB
+@-1
+RS is ""
+RW is high
+E is low
+DB is ""
+@0
+RS is "Operation"
+RW is low
+@4
+E is high
+@6
+DB is "valid data"
+@12
+E is low
+@20
+DB is ""
+RS is ""
+RW is high
+@24
+E is low
+@enduml
+```
+
+

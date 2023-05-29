@@ -56,7 +56,7 @@ void WriteElapsedTime(Lcd &lcd, unsigned int v)
 		buf[1] = '.';
 		buf[2] = (char)('0' + v);
 		buf[3] = 0;
-		l = 3;
+		l = 3;	// length of the printable string
 	}
 	else
 	{
@@ -72,7 +72,7 @@ void WriteElapsedTime(Lcd &lcd, unsigned int v)
 	}
 	// Compute padding required for move text to the right margin
 	l = 14 - l;
-		// prepend spaces
+	// prepend spaces
 	while (l--)
 		lcd.Write(' ');
 	// Write string with current time
