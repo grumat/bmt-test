@@ -20,7 +20,7 @@ typedef AnyTimerDelay<Millisec> Delay;
 // Computes the prescaler for 1 MHz counter speed
 typedef InternalClock_Hz <kTim4, SysClk, 1000000UL> Microsec;
 // Timer that overflows every 5 ms (200Hz) [note: count is 0-base]
-typedef AnyTimer<Microsec, Mode::kUpCounter, 5000UL-1UL> FiveMs;
+typedef Timer::Any<Microsec, Mode::kUpCounter, 5000UL-1UL> FiveMs;
 // This is the model that expands resolution of the Tick counter to 32-bit, 
 // but requires moderate polling rates
 typedef MicroStopWatch<FiveMs> Tick32;
