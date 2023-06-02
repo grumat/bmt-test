@@ -16,7 +16,7 @@ using namespace Bmt::Timer;
 // Computes the prescaler for 1 kHz counter speed
 typedef InternalClock_Hz <kTim4, SysClk, 1000UL> Millisec;
 // Simple Delay using a timer as time base
-typedef AnyTimerDelay<Millisec> Delay;
+typedef Timer::AnyTimerDelay<Millisec> Delay;
 // Computes the prescaler for 1 MHz counter speed
 typedef InternalClock_Hz <kTim4, SysClk, 1000000UL> Microsec;
 // Timer that overflows every 5 ms (200Hz) [note: count is 0-base]
