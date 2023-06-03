@@ -14,11 +14,11 @@ using namespace Bmt::Timer;
 #endif
 
 // Computes the prescaler for 1 kHz counter speed
-typedef InternalClock_Hz <kTim4, SysClk, 1000UL> Millisec;
+typedef InternalClock_Hz <kTim1, SysClk, 1000UL> Millisec;
 // Simple Delay using a timer as time base
-typedef Timer::AnyTimerDelay<Millisec> Delay;
+typedef AnyTimerDelay<Millisec> Delay;
 // Computes the prescaler for 1 MHz counter speed
-typedef InternalClock_Hz <kTim4, SysClk, 1000000UL> Microsec;
+typedef InternalClock_Hz <kTim1, SysClk, 1000000UL> Microsec;
 // Timer that overflows every 5 ms (200Hz) [note: count is 0-base]
 typedef Timer::Any<Microsec, Mode::kUpCounter, 5000UL-1UL> FiveMs;
 // This is the model that expands resolution of the Tick counter to 32-bit, 
@@ -157,11 +157,20 @@ void TestRGB()
 	while (true)
 	{
 		if (!stopwatch_r.IsNotElapsed())
+		{
 			LedR::Toggle();	// toggle R LED (timer will auto-reload)
+			Led::Toggle();	// std LED is now a crazy blinker
+		}
 		if (!stopwatch_g.IsNotElapsed())
+		{
 			LedG::Toggle();	// toggle G LED (timer will auto-reload)
+			Led::Toggle();	// std LED is now a crazy blinker
+		}
 		if (!stopwatch_b.IsNotElapsed())
+		{
 			LedB::Toggle();	// toggle B LED (timer will auto-reload)
+			Led::Toggle();	// std LED is now a crazy blinker
+		}
 	}
 }
 

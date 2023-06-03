@@ -134,11 +134,20 @@ void TestRGB()
 	while (true)
 	{
 		if (!stopwatch_r.IsNotElapsed())
+		{
 			LedR::Toggle();	// toggle R LED (timer will auto-reload)
+			Led::Toggle();	// std LED is now a crazy blinker
+		}
 		if (!stopwatch_g.IsNotElapsed())
+		{
 			LedG::Toggle();	// toggle G LED (timer will auto-reload)
+			Led::Toggle();	// std LED is now a crazy blinker
+		}
 		if (!stopwatch_b.IsNotElapsed())
+		{
 			LedB::Toggle();	// toggle B LED (timer will auto-reload)
+			Led::Toggle();	// std LED is now a crazy blinker
+		}
 	}
 }
 
