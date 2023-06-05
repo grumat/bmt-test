@@ -26,10 +26,6 @@ typedef Timer::Any<Microsec, Mode::kUpCounter, 5000UL-1UL> FiveMs;
 typedef MicroStopWatch<FiveMs> Tick32;
 // This is the model with more capabilities
 typedef PolledStopWatch<FiveMs> StopWatch;
-#if 0
-// The data-type representing the system tick timer
-typedef SysTickCounter<SysClk> Tick;
-#endif
 
 /*
 This function is required by STM32 startup file and called during
@@ -68,11 +64,11 @@ This is the most generic use of a delay
 */
 void SimpleUse()
 {
-	// initialize TIM4 hardware
+	// initialize TIM1 hardware
 	Delay::Init();
 	while (true)
 	{
-		// In this timer we use a timer (TIM4 for STM32F103) programmed to 
+		// In this timer we use a timer (TIM1 for STM32F103) programmed to 
 		// update every ms. The AnyTimerDelay<> template class uses the 
 		// counter to create a delay solely based on the programmed timebase
 		// of the timer.

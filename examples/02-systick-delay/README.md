@@ -327,11 +327,20 @@ void TestRGB()
 	while (true)
 	{
 		if (!stopwatch_r.IsNotElapsed())
+		{
 			LedR::Toggle();	// toggle R LED (timer will auto-reload)
+			Led::Toggle();	// std LED is now a crazy blinker
+		}
 		if (!stopwatch_g.IsNotElapsed())
+		{
 			LedG::Toggle();	// toggle G LED (timer will auto-reload)
+			Led::Toggle();	// std LED is now a crazy blinker
+		}
 		if (!stopwatch_b.IsNotElapsed())
+		{
 			LedB::Toggle();	// toggle B LED (timer will auto-reload)
+			Led::Toggle();	// std LED is now a crazy blinker
+		}
 	}
 }
 ```
@@ -345,6 +354,11 @@ the programed tick value), a new period with the same duration is added.
 > the `ToTicks()` method of the timer to convert milliseconds to ticks.  
 > Again, `ToTicks()`  is a `constexpr` method and compiler translates the 
 > formula to a constant value during compile time.
+
+And about the test itself, you will see that the RGB LED starts blinking 
+in a period with slight pseudo-random behavior, where all 8 possible 
+colors happens. And the standard LED mounted on the proto-board behaves 
+similar like a lamp with weak contacts.
 
 
 # Exercise Proposals
