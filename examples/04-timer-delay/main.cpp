@@ -68,7 +68,7 @@ void SimpleUse()
 	Delay::Init();
 	while (true)
 	{
-		// In this timer we use a timer (TIM1 for STM32F103) programmed to 
+		// In this timer we use a timer (TIM1 in this case) programmed to 
 		// update every ms. The AnyTimerDelay<> template class uses the 
 		// counter to create a delay solely based on the programmed timebase
 		// of the timer.
@@ -137,7 +137,8 @@ void UseOfLongPeriods()
 This example illustrates an additional feature of the MicroStopWatch<> class.
 A second template parameter can be defined to establish a constant auto-reload 
 feature.
-This example requires an RGB LED on the PA5, PA6 and PA7 pins.
+This example requires an RGB LED on the PA8, PA9 and PA10 pins (see hal.xxx.h
+file for platform specific connections)
 */
 void TestRGB()
 {
