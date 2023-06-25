@@ -49,7 +49,7 @@ typedef Gpio::AnyPortSetup<
 	Gpio::Unchanged<15>		// unchanged pin used for debugger
 > InitPA;
 
-// Nucleo32 features the gree LED on PB3
+// Nucleo32 features the green LED on PB3
 typedef Gpio::AnyOut<Gpio::Port::PB, 3> Led;
 typedef Gpio::AnyPortSetup <
 	Gpio::Port::PB,
