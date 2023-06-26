@@ -2,8 +2,9 @@
 
 This example repeats example `02-systick-delay`, but it demonstrates that 
 the regular timer classes serves also as time base for the polling 
-classes. This makes them more flexible, and a single programming 
-interface is accomplished.
+classes. A consistent interface between system tick and reglar timer, 
+makes development more flexible, and a single programming interface is 
+accomplished.
 
 One exception is the first test mode, which presents the 
 `Timer::AnyTimerDelay<>` template class.
@@ -57,17 +58,20 @@ Delay::Delay(350);
 
 As already told, this example substitutes the system tick timer by a 
 regular timer unit. Timer units are far more complex and powerful than 
-the System Tick Timer. They are designed for motor control, Rotary 
-encoder decoding, PWM and many other possibilities, but lack in counter 
-resolution. Except for most recent models, timer units uses always 16-bit 
-counters and the system tick timer, in the other side, features a 24-bit 
-counter.
+the System Tick Timer. They are designed for motor control, rotary 
+encoder decoding, PWM and many other possibilities, but generally lack in 
+counter resolution.
 
-But chances are that you are using a timer unit for any required feature 
-and sometimes you have to control elapsed time, so, coupling polling 
-software timers to them makes sense.
+> Except for most recent models, timer units uses always 16-bit counters 
+> and the system tick timer, in the other side, features a 24-bit 
+> counter. 
 
-The example project shows the typical use case:
+But in the case you are using a timer unit for any required feature 
+you can also use them to control elapsed time. Like in the SysTick 
+example, you just couple a *polled software timer* and you can control 
+elapsed time.
+
+The example project demonstrates a the typical use case:
 
 ```cpp
 // Computes the prescaler for 1 MHz counter speed
@@ -87,5 +91,140 @@ second line is the data-type for the timer itself, where we establish an
 
 Both, the `MicroStopWatch<>` and the `PolledStopWatch<>` templates 
 attaches the same way as with the system tick timer, very similar to what 
-we covered in the `02-systick-delay` example.
+we covered in the **`02-systick-delay` example**.
 
+
+# A Brief Description of the Experiment Type
+
+The `ExampleType` enumeration defines all **four** experiment types:
+
+```cpp
+// List of supported example types
+enum class ExampleType
+{
+	kSimple,		// Simple delay block to blink LED on a controlled period
+	kUsePolling,	// Use polling classes
+	kVeryLong,		// Example for very long durations, compensating timer overflows
+	kRGB,			// Test RGB LED on PA5, PA6, PA7
+	kLast_
+};
+```
+
+## Experiment 1: **`kSimple`**
+
+This example demonstrates the use of the `Timer::AnyTimerDelay<>` 
+dedicated timer template class to produce delays using any timer. This 
+class use the timer for this purpose only, programming the timer as a 
+single shot counter, meaning, no other timer feature are expected to be 
+used.
+
+### Setup and Compilation
+
+To select this experiment, please recompile the project with:
+ 
+```cpp
+// Please select one of the example type
+static constexpr ExampleType kExample = ExampleType::kSimple;
+```
+
+### Tested Functionality
+
+To activate the delay a simple command is required, like:
+
+```cpp
+Delay::Delay(350);
+```
+
+
+## Experiment 2: **`kUsePolling`**
+
+In this example the timer `FiveMs` is started and left running free. An 
+instance of `MicroStopWatch<>`, called `stopwatch` is used to poll the 
+hardware timer.
+The poll consists in calls to `stopwatch.IsNotElapsed()`, which updates 
+internal software timer and indicates when the interval has elapsed.
+
+### Setup and Compilation
+
+To select this experiment, please recompile the project with:
+
+```cpp
+// Please select one of the example type
+static constexpr ExampleType kExample = ExampleType::kUsePolling;
+```
+
+### Tested Functionality
+
+In this experiment you can perform other necessary tasks using the CPU
+while regularly checking for elapsed time. In the first experiment CPU
+is completely locked while the time does not elapses, and in this 
+experiment controls enters the loop block where you have the opportunity 
+to code more CPU functionality in the time interval.
+
+This is the core of the delay routine:
+
+```cpp
+Tick32 stopwatch(Msec(350));
+while (stopwatch.IsNotElapsed())
+{
+	// TODO: Add functionality while waiting for the programmed period
+	__NOP();
+}
+```
+
+
+## Experiment 3: **`kVeryLong`**
+
+Like covered on the `02-systick-delay` example, this experiment 
+illustrates the use of `PolledStopWatch<>` template class, which 
+incorporates more complexity than `MicroStopWatch<>` and allows for 
+longer periods. The first is ideal for short periods and the later for 
+very long periods. 
+
+### Setup and Compilation
+
+To select this experiment, please recompile the project with:
+
+```cpp
+// Please select one of the example type
+static constexpr ExampleType kExample = ExampleType::kVeryLong;
+```
+
+### Tested Functionality
+
+The example show a 60 seconds delay, which will work also on very high 
+timer frequencies, as long as the polling interval occurs before the 
+timer overflows.
+
+Code structure works exactly like the previous experiment:
+```cpp
+// 60 seconds delay
+StopWatch stopwatch(Msec(60000UL));
+while (stopwatch.IsNotElapsed())
+{
+	// TODO: Add functionality while waiting for the programmed period
+	__NOP();
+}
+```
+
+> Note that the programmed interval uses milliseconds and has a 32-bit
+> resolution, which means you can program delay as long as **2^32 ms**. 
+
+
+## Experiment 4: **`kRGB`**
+
+Exactly like covered `02-systick-delay` example, but using three 
+`MicroStopWatch<>` instances.
+
+### Setup and Compilation
+
+To select this experiment, please recompile the project with:
+
+```cpp
+// Please select one of the example type
+static constexpr ExampleType kExample = ExampleType::kRGB;
+```
+
+### Tested Functionality
+
+Please refer to the `02-systick-delay` example.
