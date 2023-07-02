@@ -1,0 +1,86 @@
+#pragma once
+
+/*
+** Nucleo-G431KB
+** https://www.st.com/en/evaluation-tools/nucleo-g431kb.html
+**
+** IMPORTANT! You have to short SB9 and SB10 jumpers for this example to 
+** work.
+*/
+
+// A data-type for the 24 MHz HSE clock
+typedef Clocks::AnyHse<24000000UL> Hse;		// 24MHz HSE clock
+
+// A data-type for the clock tree
+typedef Clocks::AnySycClk <
+	Hse						// Uses HSE for the clock tree
+	, Power::Mode::kRange1
+	, Clocks::AhbPrscl::k1
+	, Clocks::ApbPrscl::k8		// this is required to lower frequency, since PWM freq is quite low
+	, Clocks::ApbPrscl::k8		// this is required to lower frequency, since PWM freq is quite low
+> SysClk;
+
+// Types for experiment 4
+typedef Gpio::AnyOut<Gpio::Port::PA, 8> SignalOut;
+
+// A data-type to setup the Port A GPIO
+typedef Gpio::AnyPortSetup<
+	Gpio::Port::PA,
+	Gpio::Unused<0>,		// unused pin (input + pull-down)
+	Gpio::Unused<1>,		// unused pin (input + pull-down)
+	Gpio::Unused<2>,		// unused pin (input + pull-down)
+	Gpio::Unused<3>,		// unused pin (input + pull-down)
+	Gpio::Unused<4>,		// unused pin (input + pull-down)
+	Gpio::Unused<5>,		// unused pin (input + pull-down)
+	Gpio::Unused<6>,		// unused pin (input + pull-down)
+	Gpio::Unused<7>,		// unused pin (input + pull-down)
+	SignalOut,				// PWM output with ECG signal
+	Gpio::Unused<9>,		// unused pin (input + pull-down)
+	Gpio::Unused<10>,		// unused pin (input + pull-down)
+	Gpio::Unused<11>,		// unused pin (input + pull-down)
+	Gpio::Unused<12>,		// unused pin (input + pull-down)
+	Gpio::Unchanged<13>,	// unchanged pin used for debugger
+	Gpio::Unchanged<14>,	// unchanged pin used for debugger
+	Gpio::Unchanged<15>		// unchanged pin used for debugger
+> InitPA;
+
+// Nucleo32 features the green LED on PB8
+typedef Gpio::AnyOut<Gpio::Port::PB, 8> Led;
+typedef Gpio::AnyPortSetup <
+	Gpio::Port::PB,
+	Gpio::Unused<0>,		// unused pin (input + pull-down)
+	Gpio::Unused<1>,		// unused pin (input + pull-down)
+	Gpio::Unused<2>,		// unused pin (input + pull-down)
+	Gpio::Unchanged<3>,		// unchanged pin used for debugger
+	Gpio::Unchanged<4>,		// unchanged pin used for debugger
+	Gpio::Unused<5>,		// unused pin (input + pull-down)
+	Gpio::Unused<6>,		// unused pin (input + pull-down)
+	Gpio::Unused<7>,		// unused pin (input + pull-down)
+	Led						// LED on PB8
+> InitPB;
+
+// Port C is entirely unused
+typedef Gpio::AnyPortSetup <
+	Gpio::Port::PC
+> InitPC;
+
+
+// Computes the prescaler for 1 kHz counter speed
+typedef InternalClock_Hz <kTim1, SysClk, 250UL> PwmFreq;
+// PWM should quantize a byte (0-255)
+typedef Any<PwmFreq, Mode::kUpCounter, 255> Pwm;
+
+typedef AnyOutputChannel<Pwm
+	, Channel::k1
+	, OutMode::kPWM2
+	, Output::kEnabled
+	, Output::kDisabled
+	, true
+> PwmOut;
+
+// DMA is triggered on every timer update
+typedef Dma::AnyTim1Up<
+	Dma::Dir::kMemToPerCircular		// repeat the souce buffer forever
+	, Dma::PtrPolicy::kBytePtrInc	// source buffer are bytes
+	, Dma::PtrPolicy::kShortPtr		// destination CCR register uses 16-bit
+> TheDma;
