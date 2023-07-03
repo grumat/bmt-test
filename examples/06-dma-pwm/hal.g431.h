@@ -14,14 +14,10 @@ typedef Clocks::AnyHse<24000000UL> Hse;		// 24MHz HSE clock
 // A data-type for the clock tree
 typedef Clocks::AnySycClk <
 	Hse						// Uses HSE for the clock tree
-	, Power::Mode::kRange1
-	, Clocks::AhbPrscl::k1
-	, Clocks::ApbPrscl::k8		// this is required to lower frequency, since PWM freq is quite low
-	, Clocks::ApbPrscl::k8		// this is required to lower frequency, since PWM freq is quite low
 > SysClk;
 
-// Types for experiment 4
-typedef Gpio::AnyOut<Gpio::Port::PA, 8> SignalOut;
+// The PWM output pin where ECG is generated
+typedef Gpio::TIM1_CH1_PA8 SignalOut;
 
 // A data-type to setup the Port A GPIO
 typedef Gpio::AnyPortSetup<
@@ -65,22 +61,18 @@ typedef Gpio::AnyPortSetup <
 > InitPC;
 
 
-// Computes the prescaler for 1 kHz counter speed
-typedef InternalClock_Hz <kTim1, SysClk, 250UL> PwmFreq;
-// PWM should quantize a byte (0-255)
-typedef Any<PwmFreq, Mode::kUpCounter, 255> Pwm;
+// The timer used for PWM generation
+constexpr Timer::Unit kPwmTimer = kTim1;
+// Timer used to update samples
+constexpr Timer::Unit kUpdateTimer = kTim2;
+// Output channel for PWM output
+constexpr Timer::Channel kPwmOutChannel = Channel::k1;
+// The ID for the DMA channel used for sample transfers
+typedef Dma::IdTim2Up IdDmaUpdate;
 
-typedef AnyOutputChannel<Pwm
-	, Channel::k1
-	, OutMode::kPWM2
-	, Output::kEnabled
-	, Output::kDisabled
-	, true
-> PwmOut;
-
-// DMA is triggered on every timer update
-typedef Dma::AnyTim1Up<
-	Dma::Dir::kMemToPerCircular		// repeat the souce buffer forever
-	, Dma::PtrPolicy::kBytePtrInc	// source buffer are bytes
-	, Dma::PtrPolicy::kShortPtr		// destination CCR register uses 16-bit
-> TheDma;
+// Turns the board LED on
+inline void LedOn() { Led::SetLow(); }
+// Turns the board LED off
+inline void LedOff() { Led::SetHigh(); }
+// Checks if the board LED is on
+inline bool IsLedOn() { return Led::IsLow(); }

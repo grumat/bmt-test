@@ -12,6 +12,7 @@ typedef Clocks::AnySycClk <
 	Hse							// uses HSE for the clock tree
 > SysClk;
 
+// The PWM output pin where ECG is generated
 typedef Gpio::TIM1_CH1_PA8_OUT SignalOut;
 
 // A data-type to setup the Port A GPIO
@@ -42,6 +43,7 @@ typedef Gpio::AnyPortSetup <
 
 //! LED is connected to PC13 on BluePill
 typedef Gpio::AnyOut<Gpio::Port::PC, 13> Led;
+// A data-type to setup the Port C GPIO
 typedef Gpio::AnyPortSetup <
 	Gpio::Port::PC,
 	Gpio::Unused<0>,		// unused pin (input + pull-down)
@@ -69,9 +71,12 @@ constexpr Timer::Unit kPwmTimer = kTim1;
 constexpr Timer::Unit kUpdateTimer = kTim2;
 // Output channel for PWM output
 constexpr Timer::Channel kPwmOutChannel = Channel::k1;
-// The ID for the DMA channel used for transfers
+// The ID for the DMA channel used for sample transfers
 typedef Dma::IdTim2Up IdDmaUpdate;
 
+// Turns the board LED on
 inline void LedOn() { Led::SetLow(); }
+// Turns the board LED off
 inline void LedOff() { Led::SetHigh(); }
+// Checks if the board LED is on
 inline bool IsLedOn() { return Led::IsLow(); }
