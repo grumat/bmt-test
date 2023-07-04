@@ -2,7 +2,7 @@
 
 This example repeats example `02-systick-delay`, but it demonstrates that 
 the regular timer classes serves also as time base for the polling 
-classes. A consistent interface between system tick and reglar timer, 
+classes. A consistent interface between system tick and regular timer, 
 makes development more flexible, and a single programming interface is 
 accomplished.
 
