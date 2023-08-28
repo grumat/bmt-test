@@ -5,38 +5,32 @@
 ** https://www.st.com/content/st_com/en/products/evaluation-tools/product-evaluation-tools/mcu-mpu-eval-tools/stm32-mcu-mpu-eval-tools/stm32-nucleo-boards/nucleo-l432kc.html
 */
 
-/*
-** In this example we have a very good setting for an USB application.
-** The MSI is clocked to 48 MHz and trimmed with the 32768 Xtal, offering
-** a good accuracy for the USB device. The PLL is also used to obtain
-** 80 MHz for the CPU using the same MSI 48 MHz as source.
-*/
 
 // A data-type for the 8 MHz MSI clock
 typedef Clocks::AnyMsi<
-	Clocks::MsiFreq::k8_MHz			// Change STM32L432KC internal oscillator from 4 MHz to 8MHz (good for USB)
+	Clocks::MsiFreq::k8_MHz			// Change STM32L432KC internal oscillator from 4 MHz to 8MHz
 	, true							// Nucleo32 has an 32768 LSE Xtal that we will use for accurate MSI frequency
 > Msi;
 
 // A data-type for the clock tree
 typedef Clocks::AnySycClk <
-	Msi							// uses MSI for the clock tree
+	Msi								// uses MSI for the clock tree
 > SysClk;
 
 // A data-type to setup the Port A GPIO
 typedef Gpio::AnyPortSetup<
 	Gpio::Port::PA,
 	Gpio::Unused<0>,					// unused pin (input + pull-down)
-	Gpio::AnyOut<Gpio::Port::PA, 1>,	// LCD1602 RS pin
-	Gpio::AnyOut<Gpio::Port::PA, 2>,	// LCD1602 RW pin
-	Gpio::AnyOut<Gpio::Port::PA, 3>,	// LCD1602 EN pin
-	Gpio::AnyOut<Gpio::Port::PA, 4>,	// LCD1602 D4 pin
-	Gpio::AnyOut<Gpio::Port::PA, 5>,	// LCD1602 D5 pin
-	Gpio::AnyOut<Gpio::Port::PA, 6>,	// LCD1602 D6 pin
-	Gpio::AnyOut<Gpio::Port::PA, 7>,	// LCD1602 D7 pin
-	Gpio::Unused<8>,					// unused pin (input + pull-down)
-	Gpio::Unused<9>,					// unused pin (input + pull-down)
-	Gpio::Unused<10>,					// unused pin (input + pull-down)
+	Gpio::Unused<1>,					// unused pin (input + pull-down)
+	Gpio::Unused<2>,					// unused pin (input + pull-down)
+	Gpio::Unused<3>,					// unused pin (input + pull-down)
+	Gpio::Unused<4>,					// unused pin (input + pull-down)
+	Gpio::Unused<5>,					// unused pin (input + pull-down)
+	Gpio::Unused<6>,					// unused pin (input + pull-down)
+	Gpio::Unused<7>,					// unused pin (input + pull-down)
+	Gpio::TIM1_CH1_PA8,					// RGB LED (R pin)
+	Gpio::TIM1_CH2_PA9,					// RGB LED (G pin)
+	Gpio::TIM1_CH3_PA10,				// RGB LED (B pin)
 	Gpio::Unused<11>,					// unused pin (input + pull-down)
 	Gpio::Unused<12>,					// unused pin (input + pull-down)
 	Gpio::Unchanged<13>,				// unchanged pin used for debugger
@@ -61,7 +55,37 @@ typedef Gpio::AnyPortSetup <
 
 
 // The data-type representing the system tick timer
-typedef Timer::AnyDelay<SysClk> Delay;
 typedef Timer::SysTickCounter<SysClk> Tick;
-typedef AnyLcd1602<Delay, Timer::MicroStopWatch<Tick>, Gpio::Port::PA> Lcd;
 
+// 40 KHz PWM base frequency using Timer 1
+// This timer provides all 3 required outputs we need for this example
+typedef Timer::InternalClock_Hz<Timer::Unit::kTim1, SysClk, 40000> PwmFreq;
+// This divides base frequency by 200; also, the range we can control LED brightness
+typedef Timer::Any<PwmFreq, Timer::Mode::kUpCounter, 202> Pwm;
+
+// CH1 output drives red LED
+typedef Timer::AnyOutputChannel<Pwm
+	, Timer::Channel::k1
+	, Timer::OutMode::kPWM2
+	, Timer::Output::kInverted
+	, Timer::Output::kDisabled
+	, true
+> LEDR;
+
+// CH2 output drives green LED
+typedef Timer::AnyOutputChannel<Pwm
+	, Timer::Channel::k2
+	, Timer::OutMode::kPWM2
+	, Timer::Output::kInverted
+	, Timer::Output::kDisabled
+	, true
+> LEDG;
+
+// CH3 output drives blue LED
+typedef Timer::AnyOutputChannel<Pwm
+	, Timer::Channel::k3
+	, Timer::OutMode::kPWM2
+	, Timer::Output::kInverted
+	, Timer::Output::kDisabled
+	, true
+> LEDB;

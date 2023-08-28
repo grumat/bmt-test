@@ -4,16 +4,25 @@
 STM32F103 BluePill
 */
 
+// One can experiment to change the SysClk frequency.
+// New timing is adjusted automatically and example will
+// run exactly as before.
+#define OPT_USE_PLL		0
+
 // A data-type for the 8 MHz HSE clock
 typedef Clocks::AnyHse<> Hse;	// BluePill has a 8MHz XTAL
-#if 0 // one can experiment to change the SysClk frequency. New timing is adjusted automatically
+#if OPT_USE_PLL
 // Configure the PLL for 72 MHz
 typedef Clocks::AnyPll<Hse, 16000000UL> Pll;	// default 8MHz HSE clock
 #endif
 
 // A data-type for the clock tree
 typedef Clocks::AnySycClk <
+#if OPT_USE_PLL
+	Pll							// uses PLL for the clock tree
+#else
 	Hse							// uses HSE for the clock tree
+#endif
 > SysClk;
 
 // A data-type to setup the Port A GPIO
@@ -68,30 +77,36 @@ typedef Gpio::AnyPortSetup <
 // The data-type representing the system tick timer
 typedef Timer::SysTickCounter<SysClk> Tick;
 
-typedef InternalClock_Hz<Tim::k1, SysClk, 40000> PwmFreq;
-typedef TimerTemplate<PwmFreq, TimerMode::kUpCounter, 202> Pwm;
+// 40 KHz PWM base frequency using Timer 1
+// This timer provides all 3 required outputs we need for this example
+typedef Timer::InternalClock_Hz<Timer::Unit::kTim1, SysClk, 40000> PwmFreq;
+// This divides base frequency by 200; also, the range we can control LED brightness
+typedef Timer::Any<PwmFreq, Timer::Mode::kUpCounter, 202> Pwm;
 
-typedef TimerOutputChannel<Pwm
-	, TimChannel::k1
-	, TimOutMode::kTimOutPwm2
-	, TimOutDrive::kTimOutActiveLow
-	, TimOutDrive::kTimOutInactive
+// CH1 output drives red LED
+typedef Timer::AnyOutputChannel<Pwm
+	, Timer::Channel::k1
+	, Timer::OutMode::kPWM2
+	, Timer::Output::kInverted
+	, Timer::Output::kDisabled
 	, true
 > LEDR;
 
-typedef TimerOutputChannel<Pwm
-	, TimChannel::k2
-	, TimOutMode::kTimOutPwm2
-	, TimOutDrive::kTimOutActiveLow
-	, TimOutDrive::kTimOutInactive
+// CH2 output drives green LED
+typedef Timer::AnyOutputChannel<Pwm
+	, Timer::Channel::k2
+	, Timer::OutMode::kPWM2
+	, Timer::Output::kInverted
+	, Timer::Output::kDisabled
 	, true
 > LEDG;
 
-typedef TimerOutputChannel<Pwm
-	, TimChannel::k3
-	, TimOutMode::kTimOutPwm2
-	, TimOutDrive::kTimOutActiveLow
-	, TimOutDrive::kTimOutInactive
+// CH3 output drives blue LED
+typedef Timer::AnyOutputChannel<Pwm
+	, Timer::Channel::k3
+	, Timer::OutMode::kPWM2
+	, Timer::Output::kInverted
+	, Timer::Output::kDisabled
 	, true
 > LEDB;
 
