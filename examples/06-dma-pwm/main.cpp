@@ -52,10 +52,6 @@ static constexpr uint8_t s_EcgTable[] =
 // Size of the table containing ECG samples
 constexpr uint32_t kTableSize = _countof(s_EcgTable);
 
-// We want to specify dummy counts on update timer, within updates
-// (this increases timer clock frequency and make it suitable for higher clock frequencies)
-constexpr uint32_t kDummyCount = 100;
-
 
 // Computes the prescaler for 1 MHz counter speed
 typedef InternalClock_Hz <kPwmTimer, SysClk, 1000000> PwmFreq;
@@ -72,6 +68,11 @@ typedef AnyOutputChannel<Pwm
 	, true
 	, true
 > PwmOut;
+
+
+// We want to specify dummy counts on update timer, within updates
+// (this increases timer clock frequency and make it suitable for higher clock frequencies)
+constexpr uint32_t kDummyCount = 100;
 
 // Heart rate (Hard coded for this example; recompile for any feasible BPM)
 constexpr uint32_t kBPM = 60;
@@ -148,7 +149,7 @@ int main()
 	Tick32 stopwatch;
 	while (true)
 	{
-		// Tests if heart rate interval is ellapsed
+		// Tests if heart rate interval is elapsed
 		if (!stopwatch.IsNotElapsed())
 		{
 			// Starts a LED blink to signal ECG cycle
