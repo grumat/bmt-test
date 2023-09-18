@@ -243,6 +243,40 @@ output in PWM mode.
 
 ## Data-types for the Sample Rate Timer
 
+This setting requires quite more constants and data-types to be defined: 
+
+```cpp
+// We want to specify dummy counts on update timer, within updates
+// (this increases timer clock frequency and make it suitable for higher clock frequencies)
+constexpr uint32_t kDummyCount = 100;
+
+// Heart rate (Hard coded for this example; recompile for any feasible BPM)
+constexpr uint32_t kBPM = 60;
+
+// Data rate varies a bit so ECG image won't overlap on higher BPM rates
+constexpr uint32_t kSPS = kBPM > 60 
+	? 400 + 3*(kBPM - 60)
+	: 400
+	;
+// Computes the prescaler to copy table with ECG samples to the PWM (x kDummyCount)
+typedef InternalClock_Hz <kUpdateTimer, SysClk, kDummyCount * kSPS> UpdateFreq;
+// Updates PWM values on every counter overflow using DMA
+typedef Any<UpdateFreq, Mode::kUpCounter, kDummyCount-1> Updater;
+```
+
+Note that the `kDummyCount` is a constant that is used to define a number 
+of timer internal counts until the overflow happens and the update event 
+is triggered. It could be actually any value, but lower value tends to 
+cause compile issues in setups having specially high timer input clocks, 
+since it could happen that no prescaler value exists to achieve the 
+counter frequency. The prescaler value is a 16-bit counter. On a 8MHz 
+clock setting it should be no problem at all, but on newer STM32 you may 
+have 170 MHz, and 16-bit is easy to overflow. 
+
+The `kBPM` is a constant that specifies the *beats per minute* rate that 
+we want to simulate. Practical values should be below 160 bpm.
+
+The `kSPS` is quite tricky: 
 
 
 # Testing the Example

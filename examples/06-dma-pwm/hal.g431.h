@@ -71,8 +71,8 @@ constexpr Timer::Channel kPwmOutChannel = Channel::k1;
 typedef Dma::IdTim2Up IdDmaUpdate;
 
 // Turns the board LED on
-inline void LedOn() { Led::SetLow(); }
+inline void LedOn() { Led::SetHigh(); }
 // Turns the board LED off
-inline void LedOff() { Led::SetHigh(); }
+inline void LedOff() { Led::SetLow(); }
 // Checks if the board LED is on
-inline bool IsLedOn() { return Led::IsLow(); }
+inline bool IsLedOn() { return Led::IsHigh(); }

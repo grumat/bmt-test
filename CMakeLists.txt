@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0.0)
+cmake_minimum_required(VERSION 3.5.0)
 project(bmt-test LANGUAGES C CXX ASM VERSION 0.1.0)
 
 # Use Unix makefile with tis option to inspect command line, since I appreciate 
