@@ -70,10 +70,6 @@ typedef AnyOutputChannel<Pwm
 > PwmOut;
 
 
-// We want to specify dummy counts on update timer, within updates
-// (this increases timer clock frequency and make it suitable for higher clock frequencies)
-constexpr uint32_t kDummyCount = 100;
-
 // Heart rate (Hard coded for this example; recompile for any feasible BPM)
 constexpr uint32_t kBPM = 60;
 
@@ -82,6 +78,10 @@ constexpr uint32_t kSPS = kBPM > 60
 	? 400 + 3*(kBPM - 60)
 	: 400
 	;
+
+// We want to specify dummy counts on update timer, within updates
+// (this increases timer clock frequency and make it suitable for higher clock frequencies)
+constexpr uint32_t kDummyCount = 100;
 // Computes the prescaler to copy table with ECG samples to the PWM (x kDummyCount)
 typedef InternalClock_Hz <kUpdateTimer, SysClk, kDummyCount * kSPS> UpdateFreq;
 // Updates PWM values on every counter overflow using DMA
