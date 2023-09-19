@@ -241,15 +241,11 @@ The third definition is used to program the timer channel to operate as
 output in PWM mode.
 
 
-## Data-types for the Sample Rate Timer
+## Constants for the Heart Beat Generation
 
 This setting requires quite more constants and data-types to be defined: 
 
 ```cpp
-// We want to specify dummy counts on update timer, within updates
-// (this increases timer clock frequency and make it suitable for higher clock frequencies)
-constexpr uint32_t kDummyCount = 100;
-
 // Heart rate (Hard coded for this example; recompile for any feasible BPM)
 constexpr uint32_t kBPM = 60;
 
@@ -258,25 +254,93 @@ constexpr uint32_t kSPS = kBPM > 60
 	? 400 + 3*(kBPM - 60)
 	: 400
 	;
+```
+
+The `kBPM` is a constant that specifies the *beats per minute* rate that 
+we want to simulate. Practical values should be below 160 bpm.
+
+The `kSPS` constant is quite tricky: The default sample rate is 400 sps, 
+but we increase it gradually if the `kBPM` constant is higher than 
+60 BPM. This causes a slight stretch in the output pulse so it can still 
+fit the desired heart rate.
+
+To understand this, the programmed heart rate just starts the transfer of 
+an entire beat. By increasing the heart rate we tend to have an overlap 
+between the start and the end of the beat shape. By stretching the wave, 
+we can avoid the overlap when increasing the heart rate.
+
+> In the real world QRS-shape stretching is probably not common and it 
+should rather tend to merge the starting P-pulse with the end of the 
+T-wave. Nevertheless, as most of us know, there is a practical limit to 
+this phenomenon, described by physicians as *tachycardia*, which is 
+life-threatening. 
+
+
+## Data-types for the Sample Rate Timer
+
+These are the definitions for the timer responsible for the sample rate 
+generation:
+
+```cpp
+// We want to specify dummy counts on update timer, within updates
+// (this increases timer clock frequency and make it suitable for higher clock frequencies)
+constexpr uint32_t kDummyCount = 100;
+
 // Computes the prescaler to copy table with ECG samples to the PWM (x kDummyCount)
 typedef InternalClock_Hz <kUpdateTimer, SysClk, kDummyCount * kSPS> UpdateFreq;
 // Updates PWM values on every counter overflow using DMA
 typedef Any<UpdateFreq, Mode::kUpCounter, kDummyCount-1> Updater;
 ```
 
-Note that the `kDummyCount` is a constant that is used to define a number 
-of timer internal counts until the overflow happens and the update event 
-is triggered. It could be actually any value, but lower value tends to 
-cause compile issues in setups having specially high timer input clocks, 
-since it could happen that no prescaler value exists to achieve the 
-counter frequency. The prescaler value is a 16-bit counter. On a 8MHz 
-clock setting it should be no problem at all, but on newer STM32 you may 
-have 170 MHz, and 16-bit is easy to overflow. 
+The `kDummyCount` is a constant that defines a number of internal timer 
+counts until an overflow happens. The overflow triggers an update event, 
+which triggers one DMA transfer.  
+It could be any 16-bit value, but lower value tends to increase the timer 
+clock, which has a direct impact on the internal prescaler register, 
+also a 16-bit register. So, this value tends to shift the prescaler value 
+to a feasible operating range, also if you increase the timer frequency. 
+This means that on chips running at higher clock rates there is the 
+possibility to overflow the 16-bit prescaler and the solution is to 
+increase the *dummy* count value until the prescaler can operate in the 
+hardware specified range.  
+This value has to be chosen wisely. 
 
-The `kBPM` is a constant that specifies the *beats per minute* rate that 
-we want to simulate. Practical values should be below 160 bpm.
+> On the newer STM32 parts we can operate on lower frequencies like 8MHz 
+or less but also use the PLL to achieve 160 MHz or even more.  
+In the worst case, for a `kSPS = 400` and a `kDummyCount = 1` we 
+have `160000000 / 400 = 400000`, which is far more than the capacity of 
+a 16-bit prescaler. This reduces to `4000` for `kDummyCount = 100` which 
+is a viable value.
 
-The `kSPS` is quite tricky: 
+The `UpdateFreq` data type computes the prescaler value so that 
+`kDummyCount * kSPS` transitions happens per second.
+
+The `Updater` data-type establishes a timer configuration, clocked at the 
+`UpdateFreq` rate, counting `kDummyCount` times between each update 
+event. This is data-type that we will use to initialize the timer 
+hardware to produce the required sample rate for our ECG simulator. 
+
+
+## Data-type for the DMA
+
+The next a data-type is defined to setup our DMA channel to pump data 
+into the PWM timer each time the sample rate timer updates:
+
+```cpp
+// This DMA is triggered on every timer update
+typedef Dma::AnyChannel<
+	IdDmaUpdate
+	, Dma::Dir::kMemToPer			// runs samples in a single shot then stop
+	, Dma::PtrPolicy::kBytePtrInc	// source buffer are bytes
+	, Dma::PtrPolicy::kLongPtr		// destination CCR register
+> TheDma;
+```
+
+The `IdDmaUpdate` data-type was specified on the *Hardware Abstraction 
+Layer* file (`hal.xxx.h`), which identifies the DMA device and channel. 
+On the *BluePill* this is `Dma::IdTim2Up`, which is provided by the 
+**bmt** library and identifies the DMA channel triggered when **TIM2** 
+updates. 
 
 
 # Testing the Example
