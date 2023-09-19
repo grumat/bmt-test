@@ -2,7 +2,9 @@
 
 This example shows an implementation of an ECG simulator using DMA an 
 PWM.  
-The implementation uses two timers for the generation of the ECG signal. One for the PWM and the other provides timely samples, through a DMA trigger.
+The implementation uses two timers for the generation of the ECG signal. 
+One for the PWM and the other provides timely samples, through a DMA 
+trigger. 
 
 In the next topics we discuss implementation details.
 
@@ -193,7 +195,8 @@ resolve the correct DMA channel where ECG data will flow.
 - The `LedOn()`, `LedOff()` and `IsLedOn()` inline methods that allows 
 the control of the LED. 
 
-Then two contants are defined: a table containing the ECG samples and the count of elements on it:
+Then two contants are defined: a table containing the ECG samples and the 
+count of elements on it:
 
 
 ## ECG Samples Table
