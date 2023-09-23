@@ -5,6 +5,23 @@ Besides helping newcomers, these projects are also used to validate
 template classes for the proposed targets.
 
 
+## Supported Hardware
+
+### Bluepill (STM32F103)
+
+![Bluepill-Pinout.png](images/Bluepill-Pinout.png)
+
+
+### Nucleo32 L432KC (STM32L432KC)
+
+![nucleo_l432kc-pinout.png](images/nucleo_l432kc-pinout.png)
+
+
+### Nucleo32 G431KB (STM32G431KB)
+
+![nucleo-g431kb-pinout.png](images/nucleo-g431kb-pinout.png)
+
+
 # 01 &ndash; Clock Setup
 
 A minimal project and a good starting point, demonstrating how to setup 
