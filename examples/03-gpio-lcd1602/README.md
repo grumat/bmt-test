@@ -21,7 +21,7 @@ depends on your MCU type.
 This connection diagram shows how to interface a BluePill with a standard 
 LCD1602:
 
-![sch.f103.svg](sch.f103.svg)
+![sch.f103.svg](images/sch.f103.svg)
 
 In general the following connections are required:
 
@@ -54,7 +54,7 @@ not sure. This function controls the backlight.
 This is identical to the BluePill but another form factor; this is the 
 schematics for this setup:
 
-![sch.l432.svg](sch.l432.svg)
+![sch.l432.svg](images/sch.l432.svg)
 
 
 ### Nucleo-G431KB
@@ -67,7 +67,7 @@ function.
 > default clock. For this to work, you should ensure the solder bridges 
 > **SB9** and **SB10** are closed.
 
-![sch.g431.svg](sch.g431.svg)
+![sch.g431.svg](images/sch.g431.svg)
 
 
 ## Include File

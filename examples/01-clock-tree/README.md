@@ -45,9 +45,9 @@ folowing highlighted pins:
 ![nucleo_l432kc-fs8.png](images/nucleo_l432kc-fs8.png)
 
 
-### Optional Excercises
+### Optional Exercises
 
-As an excercise, the following is suggested:
+As an exercise, the following is suggested:
 - Try other MSI base frequencies and verify that the PLL output frequency 
 keeps unchanged, since the `Clocks::AutoRange1` calculator compute new 
 values at compile time.
@@ -57,8 +57,13 @@ pin.
 more accurate without the PLL circuit. Compare with previous test.
 - Experiment other MCO divisors.
 - Use MSI as system clock without attaching to LSE clock. In this case
-occurs a noticeable accurary loss.
+occurs a noticeable accuracy loss.
 - Still using MSI check other working frequencies.
 - In this chip HSI16 is also an option. Establish a data-type for it and 
 set it as main clock.
+
+
+## Nucleo32 G431 (STM32G431KB)
+
+![sch.g431.svg](images/sch.g431.svg)
 

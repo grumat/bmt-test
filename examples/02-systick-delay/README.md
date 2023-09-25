@@ -299,7 +299,7 @@ millisecond resolution.
 
 This is the schematics:
 
-![sch.f103.svg](sch.f103.svg)
+![sch.f103.svg](images/sch.f103.svg)
 
 > I recommend the use of a RGB LED breakout from one of those 
 > *sensor boxes* found on web-shops.
@@ -359,6 +359,11 @@ And about the test itself, you will see that the RGB LED starts blinking
 in a period with slight pseudo-random behavior, where all 8 possible 
 colors happens. And the standard LED mounted on the proto-board behaves 
 similar like a lamp with weak contacts.
+
+
+# Nucleo32 L432KC
+
+![nucleo_l432kc.png](images/nucleo_l432kc.png)
 
 
 # Exercise Proposals

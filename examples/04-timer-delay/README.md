@@ -13,6 +13,21 @@ So, please refer to the `02-systick-delay` example before checking this
 one out, for the sake of a detailed coverage of all use cases.
 
 
+## Bluepill Pinout
+
+![bluepill.png](images/bluepill.png)
+
+
+## Nucleo32 L432KC Pinout
+
+![nucleo_l432kc.png](images/nucleo_l432kc.png)
+
+
+## Nucleo32 G431KB Pinout
+
+![nucleo-g431kb.png](images/nucleo-g431kb.png)
+
+
 # The `Timer::AnyTimerDelay<>` Template Class
 
 This is the type definition for this class:
