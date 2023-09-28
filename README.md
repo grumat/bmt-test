@@ -9,17 +9,41 @@ template classes for the proposed targets.
 
 ### Bluepill (STM32F103)
 
+The bluepill is very common and easy to buy, although nowadays most of 
+them contains clones of the STM32F103 part. Some deviation from the 
+original part can happen and in the most cases it is not possible to 
+identify the actual part that was mounted and this can cause issues. 
+
+Thus, the bluepill is the most affordable option to start developing with 
+the STM32 line of micro-controllers.  
+In general, the following pinout is expected:
+
 ![Bluepill-Pinout.png](images/Bluepill-Pinout.png)
 
 
 ### Nucleo32 L432KC (STM32L432KC)
+
+The Nucleo32 is an original kit, not so cheap as a bluepill, but still 
+very affordable. It has also far more hardware mounted on it, 
+specifically a STLink V2 debug unit.
+
+This microcontroller line is more modern than the original STM32F1xx line 
+and has considerably more performance per MHz and features a single 
+precision float unit.
+
+This is the pin-out:
 
 ![nucleo_l432kc-pinout.png](images/nucleo_l432kc-pinout.png)
 
 
 ### Nucleo32 G431KB (STM32G431KB)
 
+The very recent line of low cost controllers, blows out every other 
+supported option, also on an affordable board:
+
 ![nucleo-g431kb-pinout.png](images/nucleo-g431kb-pinout.png)
+
+In this newer board generation, a STLink V3 is provided as debug unit. 
 
 
 # 01 &ndash; Clock Setup
