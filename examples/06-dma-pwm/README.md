@@ -346,9 +346,180 @@ On the *BluePill* this is `Dma::IdTim2Up`, which is provided by the
 updates. 
 
 
+## Data-type for the Stop Watch
+
+A stop watch is used to control the start of each beat and it is defined: 
+
+```cpp
+// A stopwatch to control BPM rate
+typedef MicroStopWatch <Pwm, Pwm::ToTicks(Msec(60 * 1000UL / kBPM))> Tick32;
+```
+
+The Tick32 is a type definition that will be used to create an stop watch 
+instance, that will reprogram the `TheDma` DMA channel every time a new 
+beat starts. This will autonomously draw a complete QRS-wave on the 
+output. 
+
+
+## System Initialization
+
+The first executed function is the `SystemInit()`. This is part of the 
+STM32 startup file implementation, which is responsible to initialize 
+hardware in a very early stage, before the `main()` function is called: 
+
+```cpp
+extern "C" void SystemInit()
+{
+	// Reset clock system before starting program
+	System::Init();
+	// Initialize Port A, B and C
+	InitPA::Init();
+	InitPB::Init();
+	InitPC::Init();
+	// Starts desired clock
+	SysClk::Init();
+	// Init PWM output
+	PwmOut::Init();
+	// Init sample updater
+	Updater::Init();
+	// Sample updates using DMA
+	TheDma::Init();
+}
+```
+
+The routine calls `System::Init()`, which is provided by the **bmt** 
+library as the first initialization method.  
+GPIO comes next, then the clock system, timers and DMA.
+Most of the `Init()` functions will enable clock for the peripheral. 
+
+
+## Description of the `main()` Function
+
+The main function is implements the very basic QRS simulator.
+
+At the beginning the DMA is configured to transfer the first QRS-wave:
+
+```cpp
+	// Initialize DMA to transfer values to CCR0 of PWM Output
+	TheDma::Start(s_EcgTable, PwmOut::GetCcrAddress(), _countof(s_EcgTable));
+```
+
+This command initializes the data pointers and counters of the DMA 
+channel and allows the channel to operate as soon as a trigger signal is 
+received. The following parameters are used:
+- `s_EcgTable`: which is the base address of the ECG sample table, stored 
+in the flash.
+- `PwmOut::GetCcrAddress()`: Note that the target address is the CCR 
+of the PWM. It is obtained from the `PwmOut` data-type, which is the PWM 
+channel used for output.  
+Note that if you choose another PWM channel the information will 
+propagate and program will *magically* work.
+- `_countof(s_EcgTable)`: This macro informs the total number of samples 
+present on the samples table. This also results in a constant.
+
+> Note that even if the DMA is ready for operation, transfer triggers are 
+not happening, so no data is really transferred for now.
+
+The next command enables the PWM, which will loop the counter at a high 
+speed at the current pulse width ratio:
+
+```cpp
+	// Starts the PWM
+	Pwm::CounterStart();
+```
+
+The width of the pulse depends on the current CCR value. As you have 
+noticed, the address of the register was informed before, as target 
+address of the DMA operation.
+
+PWM is running for now, but it is not modulating a signal until we start 
+to trigger DMA transfers. So, the next step will do this:
+
+```cpp
+	// Starts the first cycle of the PWM updater
+	Updater::EnableUpdateDma();
+	Updater::CounterStart();
+```
+
+The first statement enables the internal timer control flag that sends 
+update triggers to the DMA device and the second statement starts the 
+timer counter.
+
+> Please do not be confused, `TheDMA` is a data-type that controls the 
+DMA channel, while `Updater` controls the Timer, a constantly clocked 
+counter, that produces triggers for the DMA device at a constant rate. 
+
+Now that we are triggering the DMA at a constant rate, the ECG wave will 
+be autonomously formed at the output. But just a single time and then DMA 
+stops at the programmed *size* (the last parameter of `TheDma::Start()` 
+statement shown before)
+
+To next code lines will perpetuate the generation of ECG waves. But these 
+have to be started at a defined `kBPM` *heart rate*. Recall that we 
+declared the `Tick32` stopwatch data-type with the desired *heart rate*. 
+
+Now an instance of this stop watch:
+
+```cpp
+	// This software timer establishes the Heart Rate
+	Tick32 stopwatch;
+```
+
+> This stop watch is implemented in software, but ties to the PWM 
+generation timer, which counts in a constant rate. Like we covered in the `04-timer-delay` example, we have to call `stopwatch.IsNotElapsed()` 
+regularly to keep it updated, while ensuring that the elapsed period has 
+completed. 
+
+The next statement is an infinite loop, which is responsible for the 
+generation of infinite QRS pulses until the power off happens.
+
+```cpp
+	while (true)
+	{
+		//...
+	}
+```
+
+Now inside loop, we check if the stopwatch has elapsed. And in this case, 
+the LED is turned on and a new QRS-beat is started:
+
+```cpp
+	// Tests if heart rate interval is elapsed
+	if (!stopwatch.IsNotElapsed())
+	{
+		// Starts a LED blink to signal ECG cycle
+		LedOn();
+		// Restarts DMA for subsequent heart beats
+		TheDma::Start(s_EcgTable, PwmOut::GetCcrAddress(), _countof(s_EcgTable));
+	}
+```
+
+> Note that DMA transfers the programmed amount of data and stops (it 
+enters the disabled state), Even if the sample-rate timer is still 
+triggering DMA transfers, nothing happens after the programmed transfer 
+count is reached.
+
+An additional operation that we perform, is to turn the LED off after a 
+reasonable period. So the DMA transfer count is checked and after a 
+reasonable amount of data, the led is finally turned off:
+
+```cpp
+	else if (IsLedOn()
+		&& (TheDma::GetTransferCount() < (7 * kTableSize / 8)))
+	{
+		// After a short period turn LED off
+		LedOff();
+	}
+```
+
+We could have used another stopwatch to control the LED, independently of 
+the DMA state, but the example shows how to check the LED state and a way 
+to track the DMA transfer.
+
+
 # Testing the Example
 
-The image blow shows a suggested breadboard montage for this example:
+The image below shows a suggested breadboard montage for this example:
 
 ![06-dma-pwm_bb](images/06-dma-pwm_bb.png)
 
@@ -361,4 +532,22 @@ The next image shows the oscilloscope capture for this case:
 
 ![ecg](images/ecg.png)
 
+> Note on the picture, that a ripple is present, which means that the 
+band-pass filter is too smooth. As previously stated, the band-pass 
+filter requires a more design efforts.
+
+
+## Proposed Exercises
+
+1. Try other `kBPM` values.
+2. Try a solution to align LED pulse with the R wave (the slope with more 
+amplitude). Currently LED pulse is aligned with the beat start (P-wave).  
+**Hint:** The R wave happens at the 69'th DMA transfer.
+3. Try to reconfigure the PWM to output using channel 2. Don't forget to 
+rewire the GPIO hardware to use **PA9**.  
+The interesting part of this example is that, besides the hardware, you 
+will only need to specify a new value for the `kPwmOutChannel` constant 
+in the *hal* file and recompile the project. You probably should try the 
+same using regular libraries to see that this brings more headaches than 
+expected.
 

@@ -138,7 +138,6 @@ extern "C" void SystemInit()
 int main()
 {
 	// Initialize DMA to transfer values to CCR0 of PWM Output
-	TheDma::Setup();
 	TheDma::Start(s_EcgTable, PwmOut::GetCcrAddress(), _countof(s_EcgTable));
 	// Starts the PWM
 	Pwm::CounterStart();
