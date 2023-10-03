@@ -519,9 +519,21 @@ to track the DMA transfer.
 
 # Testing the Example
 
-The image below shows a suggested breadboard montage for this example:
+The image below shows a suggested breadboard montage for the bluepill to 
+test this example:
 
 ![06-dma-pwm_bb](images/06-dma-pwm_bb.png)
+
+
+This is the schematics for the L432:
+
+![sch.l432.svg](images/sch.l432.svg)
+
+
+This is the schematics for the G431:
+
+![sch.g431.svg](images/sch.g431.svg)
+
 
 The resistor value is a **4k7** and the capacitor is **1µF**.
 

@@ -9,7 +9,7 @@
 // A data-type for the 8 MHz MSI clock
 typedef Clocks::AnyMsi<
 	Clocks::MsiFreq::k8_MHz			// Change STM32L432KC internal oscillator from 4 MHz to 8MHz
-	, true							// Nucleo32 has an 32768 LSE Xtal that we will use for accurate MSI frequency
+	, true							// Nucleo32 has an 32768 LSE Xtal that trims MSI frequency accuratelly
 > Msi;
 
 // A data-type for the clock tree
@@ -54,38 +54,12 @@ typedef Gpio::AnyPortSetup <
 > InitPC;
 
 
-// The data-type representing the system tick timer
-typedef Timer::SysTickCounter<SysClk> Tick;
+// The timer used to generate PWM (requires 3 channels with I/O pins)
+static constexpr Timer::Unit kPwmTim = Timer::Unit::kTim1;
+// PWM Channel used for the Red LED
+static constexpr Timer::Channel kRedCh = Timer::Channel::k1;
+// PWM Channel used for the Green LED
+static constexpr Timer::Channel kGreenCh = Timer::Channel::k2;
+// PWM Channel used for the Blue LED
+static constexpr Timer::Channel kBlueCh = Timer::Channel::k3;
 
-// 40 KHz PWM base frequency using Timer 1
-// This timer provides all 3 required outputs we need for this example
-typedef Timer::InternalClock_Hz<Timer::Unit::kTim1, SysClk, 40000> PwmFreq;
-// This divides base frequency by 200; also, the range we can control LED brightness
-typedef Timer::Any<PwmFreq, Timer::Mode::kUpCounter, 202> Pwm;
-
-// CH1 output drives red LED
-typedef Timer::AnyOutputChannel<Pwm
-	, Timer::Channel::k1
-	, Timer::OutMode::kPWM2
-	, Timer::Output::kInverted
-	, Timer::Output::kDisabled
-	, true
-> LEDR;
-
-// CH2 output drives green LED
-typedef Timer::AnyOutputChannel<Pwm
-	, Timer::Channel::k2
-	, Timer::OutMode::kPWM2
-	, Timer::Output::kInverted
-	, Timer::Output::kDisabled
-	, true
-> LEDG;
-
-// CH3 output drives blue LED
-typedef Timer::AnyOutputChannel<Pwm
-	, Timer::Channel::k3
-	, Timer::OutMode::kPWM2
-	, Timer::Output::kInverted
-	, Timer::Output::kDisabled
-	, true
-> LEDB;
