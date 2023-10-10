@@ -12,7 +12,8 @@
 typedef Clocks::AnyHse<24000000UL> Hse;		// 24MHz HSE clock
 // Configure the PLL for 150 MHz
 /*
-** This configuration uses a calculator to obtain 150MHz from 24MHz. Obtainend PLL values are:
+** This configuration uses a calculator to obtain 150MHz from 24MHz. Obtained 
+** PLL values are:
 **		- PLLSCR:	0b03	(HSE)
 **		- PLLM:		0b001	(/2)
 **		- PLLN:		0x19	(*25)

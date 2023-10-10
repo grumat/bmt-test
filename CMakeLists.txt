@@ -1,11 +1,12 @@
 cmake_minimum_required(VERSION 3.5.0)
 project(bmt-test LANGUAGES C CXX ASM VERSION 0.1.0)
 
-# Use Unix makefile with tis option to inspect command line, since I appreciate 
+# Use Unix makefile with this option to inspect command line, since I appreciate 
 # my time and won't continue looking for similar solution in Ninja
 set(CMAKE_VERBOSE_MAKEFILE TRUE)
 
-# Set this to true to use the BSP provided with VisualGDB; if not, then CubeMX should have all BSP installed
+# Set this to true to use the BSP provided with VisualGDB; if not, then CubeMX 
+# should have all BSP installed
 set(OPT_USE_VISUALGDB false)
 
 # Configure CPU flag according to target MCU

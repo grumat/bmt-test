@@ -1,9 +1,6 @@
 #include <bmt.h>
-#include <kits/lcd1602.h>
-#include <stdlib.h>
 
 using namespace Bmt;
-using namespace Bmt::Kits::Lcd1602;
 
 #ifdef STM32F103xB
 #	include "hal.f103.h"
