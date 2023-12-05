@@ -21,7 +21,7 @@ typedef Timer::SysTickCounter<SysClk> Tick;
 // This timer provides all 3 required outputs we need for this example
 typedef Timer::InternalClock_Hz<kPwmTim, SysClk, 40000> PwmFreq;
 // This divides base frequency by 200; also, the range we can control LED brightness
-typedef Timer::Any<PwmFreq, Timer::Mode::kUpCounter, 202> Pwm;
+typedef Timer::Any<PwmFreq, Timer::Mode::kUpCounter, 200> Pwm;
 
 // CH1 output drives red LED
 typedef Timer::AnyOutputChannel<Pwm
@@ -76,7 +76,7 @@ extern "C" void SystemInit()
 
 int main()
 {
-	// A 100 millisecond timer used to update current time (auto-reload mode)
+	// A 7 millisecond timer used to update LED status (auto-reload mode)
 	Timer::MicroStopWatch<Tick, Tick::ToTicks(Timer::Msec(7))> t;
 
 	// Up or down Sliders for R, G and B LEDs. 
@@ -102,13 +102,13 @@ int main()
 		{}
 		// Controls each color slider. Slight different ranges will produce a multitude of colors
 		r = r + rd;
-		if (r > 199 || r == 0)
+		if (r >= 199 || r == 0)
 			rd = -rd;
 		g = g + gd;
-		if (g > 193 || g == 0)
+		if (g >= 193 || g == 0)
 			gd = -gd;
 		b = b + bd;
-		if (b > 197 || b == 0)
+		if (b >= 197 || b == 0)
 			bd = -bd;
 	}
 	return 0;
