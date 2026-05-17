@@ -115,11 +115,11 @@ extern "C" void SystemInit()
 	// Starts desired clock
 	SysClk::Init();
 	// Init PWM output
-	PwmOut::Init();
+	PwmOut::Setup();
 	// Init sample updater
-	Updater::Init();
+	Updater::Setup();
 	// Sample updates using DMA
-	TheDma::Init();
+	TheDma::Setup();
 }
 
 

@@ -67,7 +67,7 @@ extern "C" void SystemInit()
 	SysClk::Init();
 	// Start tick counter
 	Tick::Init();
-	LEDR::Init();
+	LEDR::Setup();
 	LEDG::Setup();
 	LEDB::Setup();
 }

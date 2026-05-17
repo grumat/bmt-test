@@ -65,7 +65,7 @@ This is the most generic use of a delay
 void SimpleUse()
 {
 	// initialize TIM1 hardware
-	Delay::Init();
+	Delay::Setup();
 	while (true)
 	{
 		// In this timer we use a timer (TIM1 in this case) programmed to 
@@ -90,7 +90,7 @@ void AdvancedUse()
 	// classes already presented on 02-systick-delay example
 	// Usually systick is the way to go, but in this example you establish a timer for 
 	// any other purpose and it can also serve as timebase for polling classes.
-	FiveMs::Init();
+	FiveMs::Setup();
 	FiveMs::CounterStart();
 	while (true)
 	{
@@ -116,7 +116,7 @@ timer overflow period. Though, this model is limited to milliseconds resolution.
 */
 void UseOfLongPeriods()
 {
-	FiveMs::Init();
+	FiveMs::Setup();
 	FiveMs::CounterStart();
 	while (true)
 	{
@@ -148,7 +148,7 @@ void TestRGB()
 	MicroStopWatch<FiveMs, FiveMs::ToTicks(Msec(601))> stopwatch_g;
 	MicroStopWatch<FiveMs, FiveMs::ToTicks(Msec(613))> stopwatch_b;
 
-	FiveMs::Init();
+	FiveMs::Setup();
 	FiveMs::CounterStart();
 	// Loop until something changes
 	while (true)
