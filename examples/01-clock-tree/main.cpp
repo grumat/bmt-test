@@ -43,7 +43,7 @@ int main()
 	while (true) // Same as true: fools the linker to keep g_Value vector in ELF file
 	{
 		// A reasonable delay to see the LED blinking
-		for(volatile int i = 0; i < 250000; ++i)
+		for(int i = 0; i < 250000; ++i)
 			__NOP();
 		// Toggle the LED
 		Led::Toggle();
