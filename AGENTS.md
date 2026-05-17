@@ -2,7 +2,11 @@
 
 ## What this repo is
 
-Embedded STM32 bare-metal example projects for the **bmt** C++17 template library. Produces `.elf` firmware images (not host executables). No tests, no CI, no lint — building is the verification step.
+Embedded STM32 bare-metal example projects for the **bmt** C++20 template library. Produces `.elf` firmware images (not host executables). No tests, no CI, no lint — building is the verification step.
+
+**Shared knowledge base**: `.kb/` — coding guidelines, bmt library design notes, implementation reviews, and test migration status. Consult this directory when making changes to examples or the bmt submodule.
+
+**Shared knowledge base**: `.kb/` — coding guidelines, bmt library design notes, implementation reviews, and test migration status. Consult this directory when making changes to examples or the bmt submodule.
 
 ## Setup
 
@@ -47,7 +51,7 @@ Build outputs per example: `<example>-<TARGET_MCU>.elf` and `.lst` (disassembly)
 ## Code conventions
 
 - **Tabs** for indentation (not spaces) — set in `.vscode/settings.json`
-- **C++17** (`-std=c++17`)
+- **C++20** (`-std=c++20`)
 - **Allman-style braces** (opening brace on new line for functions, types, namespaces)
 - Every example compiles for all three MCUs via `#ifdef STM32F103xB` / `#elif defined(STM32L432xx)` / `#elif defined(STM32G431xx)`. The variant define is injected by `add_compile_definitions(${TARGET_MCU})` in root CMake.
 - Startup file format varies by BSP source: `.c` (VisualGDB) vs `.s` assembly (CubeMX)
@@ -69,3 +73,5 @@ Cortex-Debug VSCode extension with BMP, J-Link, or ST-Link probes. Configs in `.
 | `SVD/` | SVD files for debug peripheral view |
 | `bmt/` | Git submodule — the bmt template library headers |
 | `bmt/docs/` | Library documentation (CONCEPTS.md, INSTALL.md, peripheral docs) |
+| `.kb/` | Shared knowledge base — coding guidelines, bmt design notes, test migration status |
+| `.kb/` | Shared knowledge base — coding guidelines, bmt design notes, test migration status |

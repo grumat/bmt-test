@@ -48,12 +48,12 @@ set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
 # -Wall                 Print only standard warnings, for all use Wextra
 # -ffunction-sections   Place each function item into its own section in the output file.
 # -fdata-sections       Place each data item into its own section in the output file.
-# -fomit-frame-pointer  Omit the frame pointer in functions that don’t need one.
+# -fomit-frame-pointer  Omit the frame pointer in functions that donï¿½t need one.
 # -mabi=aapcs           Defines enums to be a variable sized type.
 set(OBJECT_GEN_FLAGS " -mthumb -fno-builtin -Wall -Wno-missing-attributes -ffunction-sections -fdata-sections -fomit-frame-pointer -mabi=aapcs -fmax-errors=10")
 
 set(CMAKE_C_FLAGS   "${OBJECT_GEN_FLAGS} -std=gnu11 " CACHE INTERNAL "C Compiler options")
-set(CMAKE_CXX_FLAGS "${OBJECT_GEN_FLAGS} -std=c++17 " CACHE INTERNAL "C++ Compiler options")
+set(CMAKE_CXX_FLAGS "${OBJECT_GEN_FLAGS} -std=c++20 " CACHE INTERNAL "C++ Compiler options")
 set(CMAKE_ASM_FLAGS "${OBJECT_GEN_FLAGS} -x assembler-with-cpp " CACHE INTERNAL "ASM Compiler options")
 
 
@@ -68,7 +68,7 @@ set(CMAKE_EXE_LINKER_FLAGS "-Wl,--gc-sections --specs=nano.specs --specs=nosys.s
 
 # Options for DEBUG build
 # -Og   Enables optimizations that do not interfere with debugging.
-# -g    Produce debugging information in the operating system’s native format.
+# -g    Produce debugging information in the operating systemï¿½s native format.
 set(CMAKE_C_FLAGS_DEBUG "-Og -g" CACHE INTERNAL "C Compiler options for debug build type")
 set(CMAKE_CXX_FLAGS_DEBUG "-Og -g" CACHE INTERNAL "C++ Compiler options for debug build type")
 set(CMAKE_ASM_FLAGS_DEBUG "-g" CACHE INTERNAL "ASM Compiler options for debug build type")

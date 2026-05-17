@@ -15,7 +15,7 @@
             "windowsSdkVersion": "10.0.22000.0",
             "compilerPath": "C:/SysGCC/arm-eabi/bin/arm-none-eabi-gcc.exe",
             "cStandard": "c11",
-            "cppStandard": "c++17",
+            "cppStandard": "c++20",
             "intelliSenseMode": "windows-gcc-arm",
             "configurationProvider": "ms-vscode.cmake-tools"
         },
@@ -34,7 +34,7 @@
             "windowsSdkVersion": "10.0.22000.0",
             "compilerPath": "C:/SysGCC/arm-eabi/bin/arm-none-eabi-gcc.exe",
             "cStandard": "c11",
-            "cppStandard": "c++17",
+            "cppStandard": "c++20",
             "intelliSenseMode": "windows-gcc-arm",
             "configurationProvider": "ms-vscode.cmake-tools"
         },
@@ -53,7 +53,7 @@
             "windowsSdkVersion": "10.0.22000.0",
             "compilerPath": "C:/SysGCC/arm-eabi/bin/arm-none-eabi-gcc.exe",
             "cStandard": "c11",
-            "cppStandard": "c++17",
+            "cppStandard": "c++20",
             "intelliSenseMode": "windows-gcc-arm",
             "configurationProvider": "ms-vscode.cmake-tools"
         }
