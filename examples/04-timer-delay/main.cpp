@@ -14,18 +14,18 @@ using namespace Bmt::Timer;
 #endif
 
 // Computes the prescaler for 1 kHz counter speed
-typedef InternalClock_Hz <kTim1, SysClk, 1000UL> Millisec;
+using Millisec = InternalClock_Hz <kTim1, SysClk, 1000UL>;
 // Simple Delay using a timer as time base
-typedef AnyTimerDelay<Millisec> Delay;
+using Delay = AnyTimerDelay<Millisec>;
 // Computes the prescaler for 1 MHz counter speed
-typedef InternalClock_Hz <kTim1, SysClk, 1000000UL> Microsec;
+using Microsec = InternalClock_Hz <kTim1, SysClk, 1000000UL>;
 // Timer that overflows every 5 ms (200Hz) [note: count is 0-base]
-typedef Timer::Any<Microsec, Mode::kUpCounter, 5000UL-1UL> FiveMs;
+using FiveMs = Timer::Any<Microsec, Mode::kUpCounter, 5000UL-1UL>;
 // This is the model that expands resolution of the Tick counter to 32-bit, 
 // but requires moderate polling rates
-typedef MicroStopWatch<FiveMs> Tick32;
+using Tick32 = MicroStopWatch<FiveMs>;
 // This is the model with more capabilities
-typedef PolledStopWatch<FiveMs> StopWatch;
+using StopWatch = PolledStopWatch<FiveMs>;
 
 /*
 This function is required by STM32 startup file and called during
@@ -36,10 +36,10 @@ extern "C" void SystemInit()
 	__NOP();
 	// Reset clock system before starting program
 	System::Init();
-	// Initialize Port A, B and C
-	InitPA::Init();
-	InitPB::Init();
-	InitPC::Init();
+	// Enable clocks for all peripherals used by this firmware (once at boot)
+	PeripheralEnabler::Init();
+	// Set up all GPIO ports in one shot
+	AllGpioStartup::Setup();
 	// Starts desired clock
 	SysClk::Init();
 	__NOP();
@@ -65,7 +65,7 @@ This is the most generic use of a delay
 void SimpleUse()
 {
 	// initialize TIM1 hardware
-	Delay::Init();
+	Delay::Setup();
 	while (true)
 	{
 		// In this timer we use a timer (TIM1 in this case) programmed to 
@@ -90,7 +90,7 @@ void AdvancedUse()
 	// classes already presented on 02-systick-delay example
 	// Usually systick is the way to go, but in this example you establish a timer for 
 	// any other purpose and it can also serve as timebase for polling classes.
-	FiveMs::Init();
+	FiveMs::Setup();
 	FiveMs::CounterStart();
 	while (true)
 	{
@@ -116,7 +116,7 @@ timer overflow period. Though, this model is limited to milliseconds resolution.
 */
 void UseOfLongPeriods()
 {
-	FiveMs::Init();
+	FiveMs::Setup();
 	FiveMs::CounterStart();
 	while (true)
 	{
@@ -148,7 +148,7 @@ void TestRGB()
 	MicroStopWatch<FiveMs, FiveMs::ToTicks(Msec(601))> stopwatch_g;
 	MicroStopWatch<FiveMs, FiveMs::ToTicks(Msec(613))> stopwatch_b;
 
-	FiveMs::Init();
+	FiveMs::Setup();
 	FiveMs::CounterStart();
 	// Loop until something changes
 	while (true)

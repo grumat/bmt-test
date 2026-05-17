@@ -24,10 +24,10 @@ extern "C" void SystemInit()
 {
 	// Reset clock system before starting program
 	System::Init();
-	// Initialize Port A, B and C
-	InitPA::Init();
-	InitPB::Init();
-	InitPC::Init();
+	// Enable clocks for all peripherals used by this firmware (once at boot)
+	PeripheralEnabler::Init();
+	// Set up all GPIO ports in one shot
+	AllGpioStartup::Setup();
 	// Starts desired clock
 	SysClk::Init();
 	// Start tick counter

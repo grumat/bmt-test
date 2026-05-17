@@ -13,18 +13,18 @@
 */
 
 // A data-type for the 8 MHz MSI clock
-typedef Clocks::AnyMsi<
+using Msi = Clocks::AnyMsi<
 	Clocks::MsiFreq::k8_MHz			// Change STM32L432KC internal oscillator from 4 MHz to 8MHz (good for USB)
 	, true							// Nucleo32 has an 32768 LSE Xtal that we will use for accurate MSI frequency
-> Msi;
+>;
 
 // A data-type for the clock tree
-typedef Clocks::AnySycClk <
+using SysClk = Clocks::AnySycClk <
 	Msi							// uses MSI for the clock tree
-> SysClk;
+>;
 
 // A data-type to setup the Port A GPIO
-typedef Gpio::AnyPortSetup<
+using InitPA = Gpio::AnyPortSetup<
 	Gpio::Port::PA,
 	Gpio::Unused<0>,					// unused pin (input + pull-down)
 	Gpio::AnyOut<Gpio::Port::PA, 1>,	// LCD1602 RS pin
@@ -42,26 +42,34 @@ typedef Gpio::AnyPortSetup<
 	Gpio::Unchanged<13>,				// unchanged pin used for debugger
 	Gpio::Unchanged<14>,				// unchanged pin used for debugger
 	Gpio::Unchanged<15>					// unchanged pin used for debugger
-> InitPA;
+>;
 
 // Nucleo32 features the gree LED on PB3
-typedef Gpio::AnyOut<Gpio::Port::PB, 3> Led;
-typedef Gpio::AnyPortSetup <
+using Led = Gpio::AnyOut<Gpio::Port::PB, 3>;
+using InitPB = Gpio::AnyPortSetup <
 	Gpio::Port::PB,
 	Gpio::Unused<0>,		// unused pin (input + pull-down)
 	Gpio::Unused<1>,		// unused pin (input + pull-down)
 	Gpio::Unused<2>,		// unused pin (input + pull-down)
 	Led						// LED on PB3
-> InitPB;
+>;
 
 // Port C is entirely unused
-typedef Gpio::AnyPortSetup <
+using InitPC = Gpio::AnyPortSetup <
 	Gpio::Port::PC
-> InitPC;
+>;
 
+// All GPIO ports collected for one-shot initialization at startup
+using AllGpioStartup = Gpio::PortMerge<InitPA, InitPB, InitPC>;
+
+// All peripheral clocks collected for one-shot initialization at boot
+using PeripheralEnabler = Clocks::Enabler<
+	Gpio::PortClock<Gpio::Port::PA>,
+	Gpio::PortClock<Gpio::Port::PB>,
+	Gpio::PortClock<Gpio::Port::PC>
+>;
 
 // The data-type representing the system tick timer
-typedef Timer::AnyDelay<SysClk> Delay;
-typedef Timer::SysTickCounter<SysClk> Tick;
-typedef AnyLcd1602<Delay, Timer::MicroStopWatch<Tick>, Gpio::Port::PA> Lcd;
-
+using Delay = Timer::AnyDelay<SysClk>;
+using Tick = Timer::SysTickCounter<SysClk>;
+using Lcd = AnyLcd1602<Delay, Timer::MicroStopWatch<Tick>, Gpio::Port::PA>;

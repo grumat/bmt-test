@@ -25,10 +25,10 @@ extern "C" void SystemInit()
 	__NOP();
 	// Reset clock system before starting program
 	System::Init();
-	// Initialize Port A, B and C
-	InitPA::Init();
-	InitPB::Init();
-	InitPC::Init();
+	// Enable clocks for all peripherals used by this firmware (once at boot)
+	PeripheralEnabler::Init();
+	// Set up all GPIO ports in one shot
+	AllGpioStartup::Setup();
 	/*
 	** BluePill: Initializes HSE, then PLL and the clock tree clock, including MCO output
 	** Nucleo32 L432KC: Initializes LSE, then increases MSI with LSE trimming, PLL, clock tree with MCO output
@@ -43,7 +43,7 @@ int main()
 	while (true) // Same as true: fools the linker to keep g_Value vector in ELF file
 	{
 		// A reasonable delay to see the LED blinking
-		for(volatile int i = 0; i < 250000; ++i)
+		for(int i = 0; i < 250000; ++i)
 			__NOP();
 		// Toggle the LED
 		Led::Toggle();

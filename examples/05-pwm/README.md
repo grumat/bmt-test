@@ -84,7 +84,7 @@ To control timing, access to the System Tick Timer is granted by the
 
 ```cpp
 // The data-type representing the system tick timer
-typedef Timer::SysTickCounter<SysClk> Tick;
+using Tick = Timer::SysTickCounter<SysClk>;
 ```
 
 > This data-type was covered in 
@@ -99,10 +99,10 @@ setup a clock for the timer:
 ```cpp
 // 40 KHz PWM base frequency using Timer 1
 // This timer provides all 3 required outputs we need for this example
-typedef Timer::InternalClock_Hz<kPwmTim, SysClk, 40000> PwmFreq;
+using PwmFreq = Timer::InternalClock_Hz<kPwmTim, SysClk, 40000>;
 // This divides base frequency by 200; also, the range we can control 
 // LED brightness
-typedef Timer::Any<PwmFreq, Timer::Mode::kUpCounter, 202> Pwm;
+using Pwm = Timer::Any<PwmFreq, Timer::Mode::kUpCounter, 202>;
 ```
 
 The **`PwmFreq`** data-type establishes a timer period calculator based 
@@ -120,31 +120,31 @@ channel:
 
 ```cpp
 // CH1 output drives red LED
-typedef Timer::AnyOutputChannel<Pwm
+using LEDR = Timer::AnyOutputChannel<Pwm
 	, kRedCh
 	, Timer::OutMode::kPWM2
 	, Timer::Output::kInverted
 	, Timer::Output::kDisabled
 	, true
-> LEDR;
+>;
 
 // CH2 output drives green LED
-typedef Timer::AnyOutputChannel<Pwm
+using LEDG = Timer::AnyOutputChannel<Pwm
 	, kGreenCh
 	, Timer::OutMode::kPWM2
 	, Timer::Output::kInverted
 	, Timer::Output::kDisabled
 	, true
-> LEDG;
+>;
 
 // CH3 output drives blue LED
-typedef Timer::AnyOutputChannel<Pwm
+using LEDB = Timer::AnyOutputChannel<Pwm
 	, kGreenCh
 	, Timer::OutMode::kPWM2
 	, Timer::Output::kInverted
 	, Timer::Output::kDisabled
 	, true
-> LEDB;
+>;
 ```
 
 Definitions are the same regardless of the channel. Note that timer 
@@ -154,36 +154,67 @@ the end result, like the following:
 
 ```cpp
 // CH1 output drives red LED
-typedef Timer::AnyOutputChannel<Pwm
+using LEDR = Timer::AnyOutputChannel<Pwm
 	, kRedCh
 	, Timer::OutMode::kPWM1
 	, Timer::Output::kEnabled
 	, Timer::Output::kDisabled
 	, true
-> LEDR;
+>;
 ```
+
+
+## Peripheral Clock Management
+
+Every peripheral in the STM32 requires its clock gate (RCC enable bit) to be active before
+any register access. To manage this centrally and eliminate the double-init reset hazard,
+this example defines a `PeripheralEnabler` type alias in its *hal* file using the
+`Clocks::Enabler<>` template:
+
+```cpp
+using PeripheralEnabler = Clocks::Enabler<
+	Gpio::PortClock<Gpio::Port::PA>,
+	Gpio::Afio,			// TIM1_CH1/CH2/CH3 alternate functions on PA8/PA9/PA10
+	Gpio::PortClock<Gpio::Port::PB>,
+	Gpio::PortClock<Gpio::Port::PC>,
+	Timer::TimerDescriptor<Timer::kTim1>
+>;
+```
+
+The enabler is invoked once at boot in `SystemInit()`, right after `System::Init()`, to
+enable all peripheral clocks and pulse their reset lines. This is the first initialization
+step because every subsequent hardware access depends on the peripheral clock being active.
+
+After `PeripheralEnabler::Init()` has run, each peripheral's `Init()` or `Setup()` call
+only configures its own registers — no more RCC writes are performed. The deprecation
+warning on `EnableClock()` (visible during compilation) reminds that clock gating is now
+managed by the enabler, not by individual peripheral init functions.
+
+GPIO ports are grouped into an `AllGpioStartup` type via `Gpio::PortMerge<InitPA, InitPB, InitPC>`,
+which calls `Setup()` on all ports in a single fold expression. This abstracts the MCU-specific
+port count away from `SystemInit()`.
 
 
 ## Firmware Initialization
 
-Every STM32 program requires a startup file as part of the program, which 
-contains important system information like the default interrupt handlers 
+Every STM32 program requires a startup file as part of the program, which
+contains important system information like the default interrupt handlers
 and the reset vector handler.  
-It could sound a bit too low level, but just think that all embedded 
-hardware that your firmware wants to handle asynchronously, will do it 
-through interrupts. This file contains all available options for your 
+It could sound a bit too low level, but just think that all embedded
+hardware that your firmware wants to handle asynchronously, will do it
+through interrupts. This file contains all available options for your
 specific MCU model. 
 
-As already mentioned one of the handlers is called *reset handler*. To 
-understand how this works, when your MCU receives a reset signal from the 
-hardware pin or any of the alternative sources, it generates an 
-*interrupt* handled by the *reset handler*. This *reset handler* contains 
-the address of your *firmware boot*. The code for this is also provided 
-by the startup file, which prepares memory and other system related stuff 
-to safely start your firmware. This *boot code* expects two functions 
+As already mentioned one of the handlers is called *reset handler*. To
+understand how this works, when your MCU receives a reset signal from the
+hardware pin or any of the alternative sources, it generates an
+*interrupt* handled by the *reset handler*. This *reset handler* contains
+the address of your *firmware boot*. The code for this is also provided
+by the startup file, which prepares memory and other system related stuff
+to safely start your firmware. This *boot code* expects two functions
 from your side: the `SystemInit()` and the `main()` function.
 
-For this firmware, the `SystemInit()`, which is used to put your embedded 
+For this firmware, the `SystemInit()`, which is used to put your embedded
 peripherals in a usable state, looks like:
 
 ```cpp
@@ -195,15 +226,15 @@ extern "C" void SystemInit()
 {
 	// Reset clock system before starting program
 	System::Init();
-	// Initialize Port A, B and C
-	InitPA::Init();
-	InitPB::Init();
-	InitPC::Init();
+	// Enable clocks for all peripherals used by this firmware (once at boot)
+	PeripheralEnabler::Init();
+	// Set up all GPIO ports in one shot
+	AllGpioStartup::Setup();
 	// Starts desired clock
 	SysClk::Init();
 	// Start tick counter
 	Tick::Init();
-	LEDR::Init();
+	LEDR::Setup();
 	LEDG::Setup();
 	LEDB::Setup();
 }
@@ -211,20 +242,18 @@ extern "C" void SystemInit()
 
 This is a simple sequential function, that performs the following steps: 
 - Calls the `System::Init()` function which is provided by the **bmt** 
-library and responsible to clear clock circuits and other core 
+library and responsible to clear clock circuits and other core
 initialization.
-- Initialize the all GPIO pins, through `InitPA::Init()`, 
-`InitPB::Init()` and `InitPC::Init()` calls.
+- Enables clocks for all peripherals via `PeripheralEnabler::Init()`.
+- Sets up all GPIO pins in one shot via `AllGpioStartup::Setup()`.
 - Calls `SysClk::Init()` to start the system clock tree to run on the 
 desired MCU frequency. 
 - Starts the system tick timer, by calling `Tick::Init()`. 
-- Initialize the PWM timer by calling `LEDR::Init()`. 
-- Note the important detail here: Since all timer channels share the same 
-timer count unit, the other channels have only be setup, by calling 
+- Initialize the PWM timer channels by calling `LEDR::Setup()`, 
 `LEDG::Setup()` and `LEDB::Setup()`. 
 
-> Note that all this *functions* were declared as `inline`. This means 
-that the produced binary code is very compact and optimized. 
+> Note that all this *functions* were declared as `inline`. This means
+that the produced binary code is very compact and optimized.
 
 
 ## The `main()` Funtion

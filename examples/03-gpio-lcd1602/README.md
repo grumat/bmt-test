@@ -128,15 +128,44 @@ following types are defined:
 
 
 
+## Peripheral Clock Management
+
+Every peripheral in the STM32 requires its clock gate (RCC enable bit) to be active before
+any register access. To manage this centrally and eliminate the double-init reset hazard,
+this example defines a `PeripheralEnabler` type alias in its *hal* file using the
+`Clocks::Enabler<>` template:
+
+```cpp
+using PeripheralEnabler = Clocks::Enabler<
+	Gpio::PortClock<Gpio::Port::PA>,
+	Gpio::PortClock<Gpio::Port::PB>,
+	Gpio::PortClock<Gpio::Port::PC>
+>;
+```
+
+The enabler is invoked once at boot in `SystemInit()`, right after `System::Init()`, to
+enable all peripheral clocks and pulse their reset lines. This is the first initialization
+step because every subsequent hardware access depends on the peripheral clock being active.
+
+After `PeripheralEnabler::Init()` has run, each peripheral's `Init()` or `Setup()` call
+only configures its own registers — no more RCC writes are performed. The deprecation
+warning on `EnableClock()` (visible during compilation) reminds that clock gating is now
+managed by the enabler, not by individual peripheral init functions.
+
+GPIO ports are grouped into an `AllGpioStartup` type via `Gpio::PortMerge<InitPA, InitPB, InitPC>`,
+which calls `Setup()` on all ports in a single fold expression. This abstracts the MCU-specific
+port count away from `SystemInit()`.
+
+
 ## Initialization
 
-By STM32 convention, the `SystemInit()` is used to initialize the system 
-clock. This happens before the C/C++ library has a chance to initialize 
-itself, which means that **no object or variable can be used at this 
+By STM32 convention, the `SystemInit()` is used to initialize the system
+clock. This happens before the C/C++ library has a chance to initialize
+itself, which means that **no object or variable can be used at this
 point**. 
 
-Since all our hardware elements are also initialized using static 
-functions, we break this convention and add also other initialization 
+Since all our hardware elements are also initialized using static
+functions, we break this convention and add also other initialization
 code:
 
 
@@ -149,10 +178,10 @@ extern "C" void SystemInit()
 {
     // Reset clock system before starting program
     System::Init();
-    // Initialize Port A, B and C
-    InitPA::Init();
-    InitPB::Init();
-    InitPC::Init();
+    // Enable clocks for all peripherals used by this firmware (once at boot)
+    PeripheralEnabler::Init();
+    // Set up all GPIO ports in one shot
+    AllGpioStartup::Setup();
     // Starts desired clock
     SysClk::Init();
     // Start tick counter
@@ -160,7 +189,7 @@ extern "C" void SystemInit()
 }
 ```
 
-> Note that the LCD class requires an object instance, so we cannot do 
+> Note that the LCD class requires an object instance, so we cannot do
 > this now. This object is initialized later on the `main()` function.
 
 
@@ -357,29 +386,29 @@ class AnyLcd1602
 {
     ...
     // Configuration for driving pin D4 as output
-    typedef Gpio::AnyOut<kPort, kD4> D4_;
+    using D4_ = Gpio::AnyOut<kPort, kD4>;
     // Configuration for driving pin D5 as output
-    typedef Gpio::AnyOut<kPort, kD5> D5_;
+    using D5_ = Gpio::AnyOut<kPort, kD5>;
     // Configuration for driving pin D6 as output
-    typedef Gpio::AnyOut<kPort, kD6> D6_;
+    using D6_ = Gpio::AnyOut<kPort, kD6>;
     // Configuration for driving pin D7 as output
-    typedef Gpio::AnyOut<kPort, kD7> D7_;
+    using D7_ = Gpio::AnyOut<kPort, kD7>;
     // Output direction data-type
-    typedef Gpio::AnyPinGroup<kPort, D4_, D5_, D6_, D7_> OutPins_;
+    using OutPins_ = Gpio::AnyPinGroup<kPort, D4_, D5_, D6_, D7_>;
 
     // Configuration for reading pin D4 as input
-    typedef Gpio::AnyIn<kPort, kD4, Gpio::PuPd::kPullDown> D4in_;
+    using D4in_ = Gpio::AnyIn<kPort, kD4, Gpio::PuPd::kPullDown>;
     // Configuration for reading pin D5 as input
-    typedef Gpio::AnyIn<kPort, kD5, Gpio::PuPd::kPullDown> D5in_;
+    using D5in_ = Gpio::AnyIn<kPort, kD5, Gpio::PuPd::kPullDown>;
     // Configuration for reading pin D6 as input
-    typedef Gpio::AnyIn<kPort, kD6, Gpio::PuPd::kPullDown> D6in_;
+    using D6in_ = Gpio::AnyIn<kPort, kD6, Gpio::PuPd::kPullDown>;
     // Configuration for reading pin D7 as input
-    typedef Gpio::AnyIn<kPort, kD7, Gpio::PuPd::kPullDown> D7in_;
+    using D7in_ = Gpio::AnyIn<kPort, kD7, Gpio::PuPd::kPullDown>;
     // Input direction data-type
-    typedef Gpio::AnyPinGroup<kPort, D4in_, D5in_, D6in_, D7in_> InPins_;
+    using InPins_ = Gpio::AnyPinGroup<kPort, D4in_, D5in_, D6in_, D7in_>;
 
     // Groups 4 bits and operate them as a counter (values 0 to 15)
-    typedef Gpio::AnyCounter<D4_, D5_, D6_, D7_> DataBus_;
+    using DataBus_ = Gpio::AnyCounter<D4_, D5_, D6_, D7_>;
     ...
 };
 ```
@@ -645,7 +674,7 @@ class AnyLcd1602
 {
 	//...
 public:
-	typedef Delay Delay_;
+	using Delay_ = Delay;
 	//...
 };
 ```
@@ -663,7 +692,7 @@ The type definition for the Delay timer occurs in the *hal.xxx.h*
 file and for the STM32F103 this is:
 
 ```cpp
-typedef Timer::AnyDelay<SysClk> Delay;
+using Delay = Timer::AnyDelay<SysClk>;
 ```
 
 The `AnyDelay<>` template class offers a `constexpr`-optimized internal 

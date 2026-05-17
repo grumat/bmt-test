@@ -13,10 +13,10 @@
 */
 
 // A data-type for the 48 MHz MSI clock
-typedef Clocks::AnyMsi<
+using Msi = Clocks::AnyMsi<
 	Clocks::MsiFreq::k48_MHz		// Change STM32L432KC internal oscillator from 4 MHz to 48MHz (good for USB)
 	, true							// Nucleo32 has an 32768 LSE Xtal that we will use for accurate MSI frequency
-> Msi;
+>;
 // Configure the PLL for 80 MHz
 /*
 ** This configuration uses a calculator to obtain 80MHz from 48MHz. Obtainend PLL values are:
@@ -27,14 +27,14 @@ typedef Clocks::AnyMsi<
 **		- PLLR:		0b00	(/2)
 ** Final frequency is 48MHz (/3) (*10) (/2) = 80MHz
 */
-typedef Clocks::AnyPll<
+using Pll = Clocks::AnyPll<
 	Msi								// link to 48MHz MSI clock
 	, 80000000UL					// Max is 80 MHz
 	, Clocks::AutoRange1			// Full voltage range calculator
-> Pll;
+>;
 
 // A data-type for the clock tree
-typedef Clocks::AnySycClk <
+using SysClk = Clocks::AnySycClk <
 	Pll,							// uses PLL for the clock tree
 	//Msi,							// uses MSI for the clock tree
 	Power::Mode::kRange1,			// Full Voltage for Max performance
@@ -45,7 +45,7 @@ typedef Clocks::AnySycClk <
 	Clocks::Mco::kMsi,				// output MSI to the MCO pin (48MHz/16 = 3MHz)
 	//Clocks::Mco::kPllClk,			// output PLL to the MCO pin (80MHz/16 = 5MHz)
 	Clocks::McoPrscl::k16			// CLK/16 for the MCO output is enough
-> SysClk;
+>;
 
 /*
 ** Experiment note: Using MSI with 32768 LSE lock works very good without the PLL.
@@ -56,7 +56,7 @@ typedef Clocks::AnySycClk <
 */
 
 // A data-type to setup the Port A GPIO
-typedef Gpio::AnyPortSetup<
+using InitPA = Gpio::AnyPortSetup<
 	Gpio::Port::PA,
 	Gpio::Unused<0>,		// unused pin (input + pull-down)
 	Gpio::Unused<1>,		// unused pin (input + pull-down)
@@ -74,20 +74,29 @@ typedef Gpio::AnyPortSetup<
 	Gpio::Unchanged<13>,	// don't change SWD/JTAG
 	Gpio::Unchanged<14>,	// don't change SWD/JTAG
 	Gpio::Unchanged<15>		// don't change SWD/JTAG
-> InitPA;
+>;
 
 // Nucleo32 features the gree LED on PB3
-typedef Gpio::AnyOut<Gpio::Port::PB, 3> Led;
-typedef Gpio::AnyPortSetup <
+using Led = Gpio::AnyOut<Gpio::Port::PB, 3>;
+using InitPB = Gpio::AnyPortSetup <
 	Gpio::Port::PB,
 	Gpio::Unused<0>,		// unused pin (input + pull-down)
 	Gpio::Unused<1>,		// unused pin (input + pull-down)
 	Gpio::Unused<2>,		// unused pin (input + pull-down)
 	Led						// LED on PB3
-> InitPB;
+>;
 
 // Port C is entirely unused
-typedef Gpio::AnyPortSetup <
+using InitPC = Gpio::AnyPortSetup <
 	Gpio::Port::PC
-> InitPC;
+>;
 
+// All GPIO ports collected for one-shot initialization at startup
+using AllGpioStartup = Gpio::PortMerge<InitPA, InitPB, InitPC>;
+
+// All peripheral clocks collected for one-shot initialization at boot
+using PeripheralEnabler = Clocks::Enabler<
+	Gpio::PortClock<Gpio::Port::PA>,
+	Gpio::PortClock<Gpio::Port::PB>,
+	Gpio::PortClock<Gpio::Port::PC>
+>;

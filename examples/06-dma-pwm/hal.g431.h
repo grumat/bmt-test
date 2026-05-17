@@ -9,18 +9,18 @@
 */
 
 // A data-type for the 24 MHz HSE clock
-typedef Clocks::AnyHse<24000000UL> Hse;		// 24MHz HSE clock
+using Hse = Clocks::AnyHse<24000000UL>;		// 24MHz HSE clock
 
 // A data-type for the clock tree
-typedef Clocks::AnySycClk <
+using SysClk = Clocks::AnySycClk <
 	Hse						// Uses HSE for the clock tree
-> SysClk;
+>;
 
 // The PWM output pin where ECG is generated
-typedef Gpio::TIM1_CH1_PA8 SignalOut;
+using SignalOut = Gpio::TIM1_CH1_PA8;
 
 // A data-type to setup the Port A GPIO
-typedef Gpio::AnyPortSetup<
+using InitPA = Gpio::AnyPortSetup<
 	Gpio::Port::PA,
 	Gpio::Unused<0>,		// unused pin (input + pull-down)
 	Gpio::Unused<1>,		// unused pin (input + pull-down)
@@ -38,11 +38,11 @@ typedef Gpio::AnyPortSetup<
 	Gpio::Unchanged<13>,	// unchanged pin used for debugger
 	Gpio::Unchanged<14>,	// unchanged pin used for debugger
 	Gpio::Unchanged<15>		// unchanged pin used for debugger
-> InitPA;
+>;
 
 // Nucleo32 features the green LED on PB8
-typedef Gpio::AnyOut<Gpio::Port::PB, 8> Led;
-typedef Gpio::AnyPortSetup <
+using Led = Gpio::AnyOut<Gpio::Port::PB, 8>;
+using InitPB = Gpio::AnyPortSetup <
 	Gpio::Port::PB,
 	Gpio::Unused<0>,		// unused pin (input + pull-down)
 	Gpio::Unused<1>,		// unused pin (input + pull-down)
@@ -53,13 +53,26 @@ typedef Gpio::AnyPortSetup <
 	Gpio::Unused<6>,		// unused pin (input + pull-down)
 	Gpio::Unused<7>,		// unused pin (input + pull-down)
 	Led						// LED on PB8
-> InitPB;
+>;
 
 // Port C is entirely unused
-typedef Gpio::AnyPortSetup <
+using InitPC = Gpio::AnyPortSetup <
 	Gpio::Port::PC
-> InitPC;
+>;
 
+// All GPIO ports collected for one-shot initialization at startup
+using AllGpioStartup = Gpio::PortMerge<InitPA, InitPB, InitPC>;
+
+// All peripheral clocks collected for one-shot initialization at boot
+using PeripheralEnabler = Clocks::Enabler<
+	Gpio::PortClock<Gpio::Port::PA>,
+	Gpio::PortClock<Gpio::Port::PB>,
+	Gpio::PortClock<Gpio::Port::PC>,
+	Timer::TimerDescriptor<Timer::Unit::kTim1>,
+	Timer::TimerDescriptor<Timer::Unit::kTim2>,
+	Dma::Controller<Dma::Itf::k1>,
+	Dma::Dmamux
+>;
 
 // The timer used for PWM generation
 constexpr Timer::Unit kPwmTimer = kTim1;
@@ -68,8 +81,7 @@ constexpr Timer::Unit kUpdateTimer = kTim2;
 // Output channel for PWM output
 constexpr Timer::Channel kPwmOutChannel = Channel::k1;
 // The ID for the DMA channel used for sample transfers
-typedef Dma::IdTim2Up IdDmaUpdate;
-
+using IdDmaUpdate = Dma::IdTim2Up;
 // Turns the board LED on
 inline void LedOn() { Led::SetHigh(); }
 // Turns the board LED off

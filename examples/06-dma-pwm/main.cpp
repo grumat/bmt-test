@@ -54,20 +54,20 @@ constexpr uint32_t kTableSize = _countof(s_EcgTable);
 
 
 // Computes the prescaler for 1 MHz counter speed
-typedef InternalClock_Hz <kPwmTimer, SysClk, 1000000> PwmFreq;
+using PwmFreq = InternalClock_Hz <kPwmTimer, SysClk, 1000000>;
 // PWM should quantize a byte (0-255), producing almost 4 kHz PWM sample rate
 // A ~50 Hz low pass filter is required to produce the ECG signal
-typedef Any<PwmFreq, Mode::kUpCounter, 255> Pwm;
+using Pwm = Any<PwmFreq, Mode::kUpCounter, 255>;
 
 // The output channel, attached to PWM timer
-typedef AnyOutputChannel<Pwm
+using PwmOut = AnyOutputChannel<Pwm
 	, kPwmOutChannel
 	, OutMode::kPWM1
 	, Output::kEnabled
 	, Output::kDisabled
 	, true
 	, true
-> PwmOut;
+>;
 
 
 // Heart rate (Hard coded for this example; recompile for any feasible BPM)
@@ -83,21 +83,21 @@ constexpr uint32_t kSPS = kBPM > 60
 // (this increases timer clock frequency and make it suitable for higher clock frequencies)
 constexpr uint32_t kDummyCount = 100;
 // Computes the prescaler to copy table with ECG samples to the PWM (x kDummyCount)
-typedef InternalClock_Hz <kUpdateTimer, SysClk, kDummyCount * kSPS> UpdateFreq;
+using UpdateFreq = InternalClock_Hz <kUpdateTimer, SysClk, kDummyCount * kSPS>;
 // Updates PWM values on every counter overflow using DMA
-typedef Any<UpdateFreq, Mode::kUpCounter, kDummyCount-1> Updater;
+using Updater = Any<UpdateFreq, Mode::kUpCounter, kDummyCount-1>;
 
 // This DMA is triggered on every timer update
-typedef Dma::AnyChannel<
+using TheDma = Dma::AnyChannel<
 	IdDmaUpdate
 	, Dma::Dir::kMemToPer			// runs samples in a single shot then stop
 	, Dma::PtrPolicy::kBytePtrInc	// source buffer are bytes
 	, Dma::PtrPolicy::kLongPtr		// destination CCR register
-> TheDma;
+>;
 
 
 // A stopwatch to control BPM rate
-typedef MicroStopWatch <Pwm, Pwm::ToTicks(Msec(60 * 1000UL / kBPM))> Tick32;
+using Tick32 = MicroStopWatch <Pwm, Pwm::ToTicks(Msec(60 * 1000UL / kBPM))>;
 
 
 /*
@@ -108,18 +108,18 @@ extern "C" void SystemInit()
 {
 	// Reset clock system before starting program
 	System::Init();
-	// Initialize Port A, B and C
-	InitPA::Init();
-	InitPB::Init();
-	InitPC::Init();
+	// Enable clocks for all peripherals used by this firmware (once at boot)
+	PeripheralEnabler::Init();
+	// Set up all GPIO ports in one shot
+	AllGpioStartup::Setup();
 	// Starts desired clock
 	SysClk::Init();
 	// Init PWM output
-	PwmOut::Init();
+	PwmOut::Setup();
 	// Init sample updater
-	Updater::Init();
+	Updater::Setup();
 	// Sample updates using DMA
-	TheDma::Init();
+	TheDma::Setup();
 }
 
 
