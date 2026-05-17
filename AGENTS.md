@@ -14,7 +14,7 @@ Embedded STM32 bare-metal example projects for the **bmt** C++20 template librar
 git submodule update --init   # bmt library lives at ./bmt
 ```
 
-The project requires an `arm-none-eabi` toolchain. The default toolchain path on Windows is `C:/SysGCC/arm-eabi` (SysProgs distribution). The toolchain file: `cmake/arm-eabi.cmake`.
+The project requires an `arm-none-eabi` toolchain. The default toolchain path on Windows is `C:/SysGCC/arm-eabi` (SysProgs distribution, GCC 15.2). The toolchain file: `cmake/arm-eabi.cmake`.
 
 BSP files are read from one of two sources (selected via `OPT_USE_VISUALGDB` in root `CMakeLists.txt`):
 - **VisualGDB** (`false` by default): CubeMX HAL at `%USERPROFILE%/STM32Cube/Repository/<CUBE_MX>/Drivers`

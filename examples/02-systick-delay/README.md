@@ -34,7 +34,7 @@ declared like this:
 
 ```cpp
 // The data-type representing the system tick timer
-typedef Timer::SysTickCounter<SysClk> Tick;
+using Tick = Timer::SysTickCounter<SysClk>;
 ```
 
 The template parameter is the data-type for your clock tree, as seen on 
@@ -52,9 +52,9 @@ Two other type declaration are also done for the complete sample:
 ```cpp
 // This is the model that expands resolution of the Tick counter to 32-bit, 
 // but requires moderate polling rates
-typedef Timer::MicroStopWatch<Tick> Tick32;
+using Tick32 = Timer::MicroStopWatch<Tick>;
 // This is the model with more capabilities
-typedef Timer::PolledStopWatch<Tick> StopWatch;
+using StopWatch = Timer::PolledStopWatch<Tick>;
 ```
 
 The first is a class that binds to any specified timer to compute 
@@ -70,19 +70,60 @@ correctly updated. This rate is necessarily faster than the total timer
 period for a reload to occur.
 
 
-## Initialization
+# Peripheral Clock Management
 
-To initialize the **SysTick** hardware, simply add the `Init()` method to 
-the `SystemInit()` function.
+Every peripheral in the STM32 requires its clock gate (RCC enable bit) to be active before
+any register access. To manage this centrally and eliminate the double-init reset hazard,
+this example defines a `PeripheralEnabler` type alias in its *hal* file using the
+`Clocks::Enabler<>` template:
 
 ```cpp
-// Start tick counter
-Tick::Init();
+using PeripheralEnabler = Clocks::Enabler<
+	Gpio::PortClock<Gpio::Port::PA>,
+	Gpio::PortClock<Gpio::Port::PB>,
+	Gpio::PortClock<Gpio::Port::PC>
+>;
 ```
 
-> Note that software objects and variables are not valid inside the 
+The enabler is invoked once at boot in `SystemInit()`, right after `System::Init()`, to
+enable all peripheral clocks and pulse their reset lines. This is the first initialization
+step because every subsequent hardware access depends on the peripheral clock being active.
+
+After `PeripheralEnabler::Init()` has run, each peripheral's `Init()` or `Setup()` call
+only configures its own registers — no more RCC writes are performed. The deprecation
+warning on `EnableClock()` (visible during compilation) reminds that clock gating is now
+managed by the enabler, not by individual peripheral init functions.
+
+GPIO ports are grouped into an `AllGpioStartup` type via `Gpio::PortMerge<InitPA, InitPB, InitPC>`,
+which calls `Setup()` on all ports in a single fold expression. This abstracts the MCU-specific
+port count away from `SystemInit()`.
+
+
+## Initialization
+
+To initialize the hardware, the `SystemInit()` function (called by the reset handler)
+follows this sequence:
+
+```cpp
+extern "C" void SystemInit()
+{
+	__NOP();
+	// Reset clock system before starting program
+	System::Init();
+	// Enable clocks for all peripherals used by this firmware (once at boot)
+	PeripheralEnabler::Init();
+	// Set up all GPIO ports in one shot
+	AllGpioStartup::Setup();
+	// Starts desired clock
+	SysClk::Init();
+	// Start tick counter
+	Tick::Init();
+}
+```
+
+> Note that software objects and variables are not valid inside the
 > `SystemInit()` function. Only hardware can be accessed here.  
-> If a timer is not needed at the early startup of your firmware, the 
+> If a timer is not needed at the early startup of your firmware, the
 > initialization may also be done in your `main()` function.
 
 # Available Experiments

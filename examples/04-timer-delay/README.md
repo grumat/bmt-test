@@ -13,6 +13,36 @@ So, please refer to the `02-systick-delay` example before checking this
 one out, for the sake of a detailed coverage of all use cases.
 
 
+# Peripheral Clock Management
+
+Every peripheral in the STM32 requires its clock gate (RCC enable bit) to be active before
+any register access. To manage this centrally and eliminate the double-init reset hazard,
+this example defines a `PeripheralEnabler` type alias in its *hal* file using the
+`Clocks::Enabler<>` template:
+
+```cpp
+using PeripheralEnabler = Clocks::Enabler<
+	Gpio::PortClock<Gpio::Port::PA>,
+	Gpio::PortClock<Gpio::Port::PB>,
+	Gpio::PortClock<Gpio::Port::PC>,
+	Timer::TimerDescriptor<Timer::kTim1>
+>;
+```
+
+The enabler is invoked once at boot in `SystemInit()`, right after `System::Init()`, to
+enable all peripheral clocks and pulse their reset lines. This is the first initialization
+step because every subsequent hardware access depends on the peripheral clock being active.
+
+After `PeripheralEnabler::Init()` has run, each peripheral's `Init()` or `Setup()` call
+only configures its own registers â€” no more RCC writes are performed. The deprecation
+warning on `EnableClock()` (visible during compilation) reminds that clock gating is now
+managed by the enabler, not by individual peripheral init functions.
+
+GPIO ports are grouped into an `AllGpioStartup` type via `Gpio::PortMerge<InitPA, InitPB, InitPC>`,
+which calls `Setup()` on all ports in a single fold expression. This abstracts the MCU-specific
+port count away from `SystemInit()`.
+
+
 ## Bluepill Pinout
 
 ![bluepill.png](images/bluepill.png)
@@ -34,9 +64,9 @@ This is the type definition for this class:
 
 ```cpp
 // Computes the prescaler for 1 kHz counter speed
-typedef InternalClock_Hz <kTim1, SysClk, 1000UL> Millisec;
+using Millisec = InternalClock_Hz <kTim1, SysClk, 1000UL>;
 // Simple Delay using a timer as time base
-typedef Timer::AnyTimerDelay<Millisec> Delay;
+using Delay = Timer::AnyTimerDelay<Millisec>;
 ```
 
 The two lines above shows:
@@ -90,17 +120,17 @@ The example project demonstrates a the typical use case:
 
 ```cpp
 // Computes the prescaler for 1 MHz counter speed
-typedef InternalClock_Hz <kTim1, SysClk, 1000000UL> Microsec;
+using Microsec = InternalClock_Hz <kTim1, SysClk, 1000000UL>;
 // Timer that overflows every 5 ms (200Hz) [note: count is 0-base]
-typedef Timer::Any<Microsec, Mode::kUpCounter, 5000UL-1UL> FiveMs;
+using FiveMs = Timer::Any<Microsec, Mode::kUpCounter, 5000UL-1UL>;
 // This is the model that expands resolution of the Tick counter to 32-bit, 
 // but requires moderate polling rates
-typedef MicroStopWatch<FiveMs> Tick32;
+using Tick32 = MicroStopWatch<FiveMs>;
 // This is the model with more capabilities
-typedef PolledStopWatch<FiveMs> StopWatch;
+using StopWatch = PolledStopWatch<FiveMs>;
 ```
 
-First we establish an internal clock of 1 MHz (1 µs) for **TIM1**. The 
+First we establish an internal clock of 1 MHz (1 ï¿½s) for **TIM1**. The 
 second line is the data-type for the timer itself, where we establish an 
 *up-counter* for 5000 steps, which corresponds to 5 ms (i.e. 200 Hz).
 

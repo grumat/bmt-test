@@ -14,12 +14,12 @@ using namespace Bmt;
 
 
 // The data-type representing the system tick timer
-typedef Timer::SysTickCounter<SysClk> Tick;
+using Tick = Timer::SysTickCounter<SysClk>;
 // This is the model that expands resolution of the Tick counter to 32-bit, 
 // but requires moderate polling rates
-typedef Timer::MicroStopWatch<Tick> Tick32;
+using Tick32 = Timer::MicroStopWatch<Tick>;
 // This is the model with more capabilities
-typedef Timer::PolledStopWatch<Tick> StopWatch;
+using StopWatch = Timer::PolledStopWatch<Tick>;
 
 
 /*
@@ -31,10 +31,10 @@ extern "C" void SystemInit()
 	__NOP();
 	// Reset clock system before starting program
 	System::Init();
-	// Initialize Port A, B and C
-	InitPA::Init();
-	InitPB::Init();
-	InitPC::Init();
+	// Enable clocks for all peripherals used by this firmware (once at boot)
+	PeripheralEnabler::Init();
+	// Set up all GPIO ports in one shot
+	AllGpioStartup::Setup();
 	// Starts desired clock
 	SysClk::Init();
 	// Start tick counter

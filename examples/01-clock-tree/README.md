@@ -63,6 +63,32 @@ occurs a noticeable accuracy loss.
 set it as main clock.
 
 
+# Peripheral Clock Management
+
+Every peripheral in the STM32 requires its clock gate (RCC enable bit) to be active before
+any register access. To manage this centrally and eliminate the double-init reset hazard,
+this example defines a `PeripheralEnabler` type alias in its *hal* file using the
+`Clocks::Enabler<>` template:
+
+```cpp
+using PeripheralEnabler = Clocks::Enabler<
+	Gpio::PortClock<Gpio::Port::PA>,
+	Gpio::Afio,			// MCO alternate function on PA8
+	Gpio::PortClock<Gpio::Port::PB>,
+	Gpio::PortClock<Gpio::Port::PC>
+>;
+```
+
+The enabler is invoked once at boot in `SystemInit()`, right after `System::Init()`, to
+enable all peripheral clocks and pulse their reset lines. This is the first initialization
+step because every subsequent hardware access depends on the peripheral clock being active.
+
+After `PeripheralEnabler::Init()` has run, each peripheral's `Init()` or `Setup()` call
+only configures its own registers — no more RCC writes are performed. The deprecation
+warning on `EnableClock()` (visible during compilation) reminds that clock gating is now
+managed by the enabler, not by individual peripheral init functions.
+
+
 ## Nucleo32 G431 (STM32G431KB)
 
 ![sch.g431.svg](images/sch.g431.svg)

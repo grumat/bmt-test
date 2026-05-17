@@ -95,7 +95,7 @@ wave.
 
 # Band Pass Filter
 
-The period of the timer is 256 µs, which is almost 4 kHz. ECG frequencies 
+The period of the timer is 256 ï¿½s, which is almost 4 kHz. ECG frequencies 
 are in a on much lower. This enormous difference allows us to use a very 
 simple band-pass filter.
 
@@ -222,20 +222,20 @@ the information taken from the header file.
 
 ```cpp
 // Computes the prescaler for 1 MHz counter speed
-typedef InternalClock_Hz <kPwmTimer, SysClk, 1000000> PwmFreq;
+using PwmFreq = InternalClock_Hz <kPwmTimer, SysClk, 1000000>;
 // PWM should quantize a byte (0-255), producing almost 4 kHz PWM sample rate
 // A ~50 Hz low pass filter is required to produce the ECG signal
-typedef Any<PwmFreq, Mode::kUpCounter, 255> Pwm;
+using Pwm = Any<PwmFreq, Mode::kUpCounter, 255>;
 
 // The output channel, attached to PWM timer
-typedef AnyOutputChannel<Pwm
+using PwmOut = AnyOutputChannel<Pwm
 	, kPwmOutChannel
 	, OutMode::kPWM1
 	, Output::kEnabled
 	, Output::kDisabled
 	, true
 	, true
-> PwmOut;
+>;
 ```
 
 The definitions establishes a PWM frequency of 1 MHz, and a PWM counting 
@@ -290,9 +290,9 @@ generation:
 constexpr uint32_t kDummyCount = 100;
 
 // Computes the prescaler to copy table with ECG samples to the PWM (x kDummyCount)
-typedef InternalClock_Hz <kUpdateTimer, SysClk, kDummyCount * kSPS> UpdateFreq;
+using UpdateFreq = InternalClock_Hz <kUpdateTimer, SysClk, kDummyCount * kSPS>;
 // Updates PWM values on every counter overflow using DMA
-typedef Any<UpdateFreq, Mode::kUpCounter, kDummyCount-1> Updater;
+using Updater = Any<UpdateFreq, Mode::kUpCounter, kDummyCount-1>;
 ```
 
 The `kDummyCount` is a constant that defines a number of internal timer 
@@ -331,12 +331,12 @@ into the PWM timer each time the sample rate timer updates:
 
 ```cpp
 // This DMA is triggered on every timer update
-typedef Dma::AnyChannel<
+using TheDma = Dma::AnyChannel<
 	IdDmaUpdate
 	, Dma::Dir::kMemToPer			// runs samples in a single shot then stop
 	, Dma::PtrPolicy::kBytePtrInc	// source buffer are bytes
 	, Dma::PtrPolicy::kLongPtr		// destination CCR register
-> TheDma;
+>;
 ```
 
 The `IdDmaUpdate` data-type was specified on the *Hardware Abstraction 
@@ -352,7 +352,7 @@ A stop watch is used to control the start of each beat and it is defined:
 
 ```cpp
 // A stopwatch to control BPM rate
-typedef MicroStopWatch <Pwm, Pwm::ToTicks(Msec(60 * 1000UL / kBPM))> Tick32;
+using Tick32 = MicroStopWatch <Pwm, Pwm::ToTicks(Msec(60 * 1000UL / kBPM))>;
 ```
 
 The Tick32 is a type definition that will be used to create an stop watch 
@@ -361,10 +361,43 @@ beat starts. This will autonomously draw a complete QRS-wave on the
 output. 
 
 
+## Peripheral Clock Management
+
+Every peripheral in the STM32 requires its clock gate (RCC enable bit) to be active before
+any register access. To manage this centrally and eliminate the double-init reset hazard,
+this example defines a `PeripheralEnabler` type alias in its *hal* file using the
+`Clocks::Enabler<>` template:
+
+```cpp
+using PeripheralEnabler = Clocks::Enabler<
+	Gpio::PortClock<Gpio::Port::PA>,
+	Gpio::Afio,			// TIM1_CH1 alternate function on PA8
+	Gpio::PortClock<Gpio::Port::PB>,
+	Gpio::PortClock<Gpio::Port::PC>,
+	Timer::TimerDescriptor<Timer::kTim1>,
+	Timer::TimerDescriptor<Timer::kTim2>,
+	Dma::Controller<Dma::Itf::k1>
+>;
+```
+
+The enabler is invoked once at boot in `SystemInit()`, right after `System::Init()`, to
+enable all peripheral clocks and pulse their reset lines. This is the first initialization
+step because every subsequent hardware access depends on the peripheral clock being active.
+
+After `PeripheralEnabler::Init()` has run, each peripheral's `Init()` or `Setup()` call
+only configures its own registers â€” no more RCC writes are performed. The deprecation
+warning on `EnableClock()` (visible during compilation) reminds that clock gating is now
+managed by the enabler, not by individual peripheral init functions.
+
+GPIO ports are grouped into an `AllGpioStartup` type via `Gpio::PortMerge<InitPA, InitPB, InitPC>`,
+which calls `Setup()` on all ports in a single fold expression. This abstracts the MCU-specific
+port count away from `SystemInit()`.
+
+
 ## System Initialization
 
-The first executed function is the `SystemInit()`. This is part of the 
-STM32 startup file implementation, which is responsible to initialize 
+The first executed function is the `SystemInit()`. This is part of the
+STM32 startup file implementation, which is responsible to initialize
 hardware in a very early stage, before the `main()` function is called: 
 
 ```cpp
@@ -372,25 +405,27 @@ extern "C" void SystemInit()
 {
 	// Reset clock system before starting program
 	System::Init();
-	// Initialize Port A, B and C
-	InitPA::Init();
-	InitPB::Init();
-	InitPC::Init();
+	// Enable clocks for all peripherals used by this firmware (once at boot)
+	PeripheralEnabler::Init();
+	// Set up all GPIO ports in one shot
+	AllGpioStartup::Setup();
 	// Starts desired clock
 	SysClk::Init();
 	// Init PWM output
-	PwmOut::Init();
+	PwmOut::Setup();
 	// Init sample updater
-	Updater::Init();
+	Updater::Setup();
 	// Sample updates using DMA
-	TheDma::Init();
+	TheDma::Setup();
 }
 ```
 
-The routine calls `System::Init()`, which is provided by the **bmt** 
+The routine calls `System::Init()`, which is provided by the **bmt**
 library as the first initialization method.  
-GPIO comes next, then the clock system, timers and DMA.
-Most of the `Init()` functions will enable clock for the peripheral. 
+Then `PeripheralEnabler::Init()` enables clocks for all peripherals at once.
+`AllGpioStartup::Setup()` initializes all GPIO ports, then the clock system, timers and DMA.
+Most of the `Setup()` functions only configure registers â€” clock gating is
+already handled by the enabler.
 
 
 ## Description of the `main()` Function
@@ -535,7 +570,7 @@ This is the schematics for the G431:
 ![sch.g431.svg](images/sch.g431.svg)
 
 
-The resistor value is a **4k7** and the capacitor is **1µF**.
+The resistor value is a **4k7** and the capacitor is **1ï¿½F**.
 
 The orange wire is the Oscilloscope positive probe and black wire is the 
 ground. 

@@ -15,40 +15,40 @@ using namespace Bmt;
 
 
 // The data-type representing the system tick timer
-typedef Timer::SysTickCounter<SysClk> Tick;
+using Tick = Timer::SysTickCounter<SysClk>;
 
 // 40 KHz PWM base frequency using Timer 1
 // This timer provides all 3 required outputs we need for this example
-typedef Timer::InternalClock_Hz<kPwmTim, SysClk, 40000> PwmFreq;
+using PwmFreq = Timer::InternalClock_Hz<kPwmTim, SysClk, 40000>;
 // This divides base frequency by 200; also, the range we can control LED brightness
-typedef Timer::Any<PwmFreq, Timer::Mode::kUpCounter, 200> Pwm;
+using Pwm = Timer::Any<PwmFreq, Timer::Mode::kUpCounter, 200>;
 
 // CH1 output drives red LED
-typedef Timer::AnyOutputChannel<Pwm
+using LEDR = Timer::AnyOutputChannel<Pwm
 	, kRedCh
 	, Timer::OutMode::kPWM2
 	, Timer::Output::kInverted
 	, Timer::Output::kDisabled
 	, true
-> LEDR;
+>;
 
 // CH2 output drives green LED
-typedef Timer::AnyOutputChannel<Pwm
+using LEDG = Timer::AnyOutputChannel<Pwm
 	, kGreenCh
 	, Timer::OutMode::kPWM2
 	, Timer::Output::kInverted
 	, Timer::Output::kDisabled
 	, true
-> LEDG;
+>;
 
 // CH3 output drives blue LED
-typedef Timer::AnyOutputChannel<Pwm
+using LEDB = Timer::AnyOutputChannel<Pwm
 	, kGreenCh
 	, Timer::OutMode::kPWM2
 	, Timer::Output::kInverted
 	, Timer::Output::kDisabled
 	, true
-> LEDB;
+>;
 
 
 /*
@@ -59,10 +59,10 @@ extern "C" void SystemInit()
 {
 	// Reset clock system before starting program
 	System::Init();
-	// Initialize Port A, B and C
-	InitPA::Init();
-	InitPB::Init();
-	InitPC::Init();
+	// Enable clocks for all peripherals used by this firmware (once at boot)
+	PeripheralEnabler::Init();
+	// Set up all GPIO ports in one shot
+	AllGpioStartup::Setup();
 	// Starts desired clock
 	SysClk::Init();
 	// Start tick counter

@@ -42,8 +42,19 @@ Message on DMA: `"Add this DMA channel to platform PeripheralEnabler, then call 
 | 05-pwm | `LEDR::Init()` → `Setup()` (all three channels now use `Setup()`) |
 | 06-dma-pwm | `PwmOut::Init()` → `Setup()`, `Updater::Init()` → `Setup()`, `TheDma::Init()` → `Setup()` |
 
+### Completed
+
+- **`PeripheralEnabler`** type alias is now defined in **all 18 hal files** (6× F103, 6× G431, 6× L432), listing every peripheral (GPIO ports, timers, DMA controller) needed by that firmware.
+- All 18 hal files define `AllGpioStartup = Gpio::PortMerge<InitPA, InitPB, InitPC>` for one-shot GPIO setup via `AllGpioStartup::Setup()` in `SystemInit()`.
+- All 6 examples call both `AllGpioStartup::Setup()` and `PeripheralEnabler::Init()` in `SystemInit()` right after `System::Init()`.
+- **`RccTrait_` infrastructure added for g4xx/l4xx:**
+  - `Gpio::PortClock<Port>` — GPIO port clock trait on AHB2ENR (matching F1xx on APB2)
+  - `Timer::TimerDescriptor<Unit>` — compile-time RCC enable/reset-bit descriptor (new struct, matching F1xx)
+  - `Dma::Controller<Itf>` — DMA controller clock trait on AHB1ENR
+  - `Dma::Dmamux` (g4xx only) — DMAMUX clock trait on AHB1ENR
+
 ### Remaining work
 
-- g4xx and l4xx `Init()` methods still use direct RCC register writes (massive switch blocks) rather than `Clocks::Enabler<T>::Init()`. They need integration into the `RccEnabler` framework (adding `RccTrait_` to each peripheral).
-- No `PeripheralEnabler` type alias is defined in any example's hal files yet.
+- g4xx and l4xx legacy `Init()` methods still use direct RCC register writes (the massive `switch` blocks in timer/dma/gpio headers) rather than `Clocks::Enabler<T>::Init()`. The `RccTrait_` is now available but the old `Init()` bodies have not been removed — both paths coexist.
 - g4xx and l4xx GPIO `AnyPortSetup::Init()` and EXTI `Enable()` are not yet deprecated.
+- `typedef` → `using` migration is complete across all source files and README examples.

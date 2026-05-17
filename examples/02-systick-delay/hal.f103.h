@@ -5,20 +5,26 @@ STM32F103 BluePill
 */
 
 // A data-type for the 8 MHz HSE clock
-typedef Clocks::AnyHse<> Hse;	// BluePill has a 8MHz XTAL
+using Hse = Clocks::AnyHse<>;	// BluePill has a 8MHz XTAL
+
+using PeripheralEnabler = Clocks::Enabler<
+	Gpio::PortClock<Gpio::Port::PA>,
+	Gpio::PortClock<Gpio::Port::PB>,
+	Gpio::PortClock<Gpio::Port::PC>
+>;
 
 // A data-type for the clock tree
-typedef Clocks::AnySycClk <
+using SysClk = Clocks::AnySycClk <
 	Hse							// uses HSE for the clock tree
-> SysClk;
+>;
 
 // Types for experiment 4
-typedef Gpio::AnyOut<Gpio::Port::PA, 5> LedB;
-typedef Gpio::AnyOut<Gpio::Port::PA, 6> LedG;
-typedef Gpio::AnyOut<Gpio::Port::PA, 7> LedR;
+using LedB = Gpio::AnyOut<Gpio::Port::PA, 5>;
+using LedG = Gpio::AnyOut<Gpio::Port::PA, 6>;
+using LedR = Gpio::AnyOut<Gpio::Port::PA, 7>;
 
 // A data-type to setup the Port A GPIO
-typedef Gpio::AnyPortSetup<
+using InitPA = Gpio::AnyPortSetup<
 	Gpio::Port::PA,
 	Gpio::Unused<0>,		// unused pin (input + pull-down)
 	Gpio::Unused<1>,		// unused pin (input + pull-down)
@@ -36,16 +42,16 @@ typedef Gpio::AnyPortSetup<
 	Gpio::Unchanged<13>,	// unchanged pin used for debugger
 	Gpio::Unchanged<14>,	// unchanged pin used for debugger
 	Gpio::Unchanged<15>		// unchanged pin used for debugger
-> InitPA;
+>;
 
 // Port B is entirely unused
-typedef Gpio::AnyPortSetup <
+using InitPB = Gpio::AnyPortSetup <
 	Gpio::Port::PB
-> InitPB;
+>;
 
 //! LED is connected to PC13 on BluePill
-typedef Gpio::AnyOut<Gpio::Port::PC, 13> Led;
-typedef Gpio::AnyPortSetup <
+using Led = Gpio::AnyOut<Gpio::Port::PC, 13>;
+using InitPC = Gpio::AnyPortSetup <
 	Gpio::Port::PC,
 	Gpio::Unused<0>,		// unused pin (input + pull-down)
 	Gpio::Unused<1>,		// unused pin (input + pull-down)
@@ -63,5 +69,7 @@ typedef Gpio::AnyPortSetup <
 	Led,					// LED on PC13
 	Gpio::Unchanged<14>,	// HSE here
 	Gpio::Unchanged<15>
-> InitPC;
+>;
 
+// All GPIO ports collected for one-shot initialization at startup
+using AllGpioStartup = Gpio::PortMerge<InitPA, InitPB, InitPC>;

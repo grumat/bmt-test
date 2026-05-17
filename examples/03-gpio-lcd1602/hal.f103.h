@@ -5,19 +5,25 @@ STM32F103 BluePill
 */
 
 // A data-type for the 8 MHz HSE clock
-typedef Clocks::AnyHse<> Hse;	// BluePill has a 8MHz XTAL
+using Hse = Clocks::AnyHse<>;	// BluePill has a 8MHz XTAL
+
+using PeripheralEnabler = Clocks::Enabler<
+	Gpio::PortClock<Gpio::Port::PA>,
+	Gpio::PortClock<Gpio::Port::PB>,
+	Gpio::PortClock<Gpio::Port::PC>
+>;
 #if 0 // one can experiment to change the SysClk frequency. New timing is adjusted automatically
 // Configure the PLL for 72 MHz
-typedef Clocks::AnyPll<Hse, 16000000UL> Pll;	// default 8MHz HSE clock
+using Pll = Clocks::AnyPll<Hse, 16000000UL>;	// default 8MHz HSE clock
 #endif
 
 // A data-type for the clock tree
-typedef Clocks::AnySycClk <
+using SysClk = Clocks::AnySycClk <
 	Hse							// uses HSE for the clock tree
-> SysClk;
+>;
 
 // A data-type to setup the Port A GPIO
-typedef Gpio::AnyPortSetup<
+using InitPA = Gpio::AnyPortSetup<
 	Gpio::Port::PA,
 	Gpio::Unused<0>,					// unused pin (input + pull-down)
 	Gpio::AnyOut<Gpio::Port::PA, 1>,	// LCD1602 RS pin
@@ -35,16 +41,16 @@ typedef Gpio::AnyPortSetup<
 	Gpio::Unchanged<13>,				// unchanged pin used for debugger
 	Gpio::Unchanged<14>,				// unchanged pin used for debugger
 	Gpio::Unchanged<15>					// unchanged pin used for debugger
-> InitPA;
+>;
 
 // Port B is entirely unused
-typedef Gpio::AnyPortSetup <
+using InitPB = Gpio::AnyPortSetup <
 	Gpio::Port::PB
-> InitPB;
+>;
 
 //! LED is connected to PC13 on BluePill
-typedef Gpio::AnyOut<Gpio::Port::PC, 13> Led;
-typedef Gpio::AnyPortSetup <
+using Led = Gpio::AnyOut<Gpio::Port::PC, 13>;
+using InitPC = Gpio::AnyPortSetup <
 	Gpio::Port::PC,
 	Gpio::Unused<0>,		// unused pin (input + pull-down)
 	Gpio::Unused<1>,		// unused pin (input + pull-down)
@@ -62,11 +68,12 @@ typedef Gpio::AnyPortSetup <
 	Led,					// LED on PC13
 	Gpio::Unchanged<14>,
 	Gpio::Unchanged<15>
-> InitPC;
+>;
 
+// All GPIO ports collected for one-shot initialization at startup
+using AllGpioStartup = Gpio::PortMerge<InitPA, InitPB, InitPC>;
 
 // The data-type representing the system tick timer
-typedef Timer::AnyDelay<SysClk> Delay;
-typedef Timer::SysTickCounter<SysClk> Tick;
-typedef AnyLcd1602<Delay, Timer::MicroStopWatch<Tick>, Gpio::Port::PA> Lcd;
-
+using Delay = Timer::AnyDelay<SysClk>;
+using Tick = Timer::SysTickCounter<SysClk>;
+using Lcd = AnyLcd1602<Delay, Timer::MicroStopWatch<Tick>, Gpio::Port::PA>;

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5.0)
+cmake_minimum_required(VERSION 3.10.0)
 
 set(APP_NAME 06-dma-pwm-${TARGET_MCU}.elf)
 
